@@ -96,9 +96,6 @@ let box_input  = StaticBox(panel, label="Select Input")
 let box_QR     = StaticBox(panel, label="Display QR code")
 let box_decode = StaticBox(panel, label="Decode file")
 let box_output = StaticBox(panel, label="Output")
-# box_input.margin = 20
-# box_QR.margin = 20
-# box_decode.margin = 20
 box_output.margin = 20
 
 let rb_file = RadioButton(panel, label="File Name")
@@ -137,14 +134,11 @@ proc layout() =
         H:|-[btn_decode]-|
         V:|-[btn_decode]-|
     """
-    # V:|-[label_err,cb_err]-[btn_qr]-[panel_qr]-|
     box_output.contain(box_QR, box_decode)
 
 btn_input.wEvent_Button do ():
     let input_file_name: seq[string] = file_sel.display()
     input_file.setValue(input_file_name[0])
-
-# var bm = StaticBitmap(panel_qr.page(0), bitmap=Bitmap("test.bmp"), style=wSbFit)
 
 proc createQRThread(hMain: HWND) {.thread.} =
   {.gcsafe.}:
@@ -163,7 +157,6 @@ proc createQRThread(hMain: HWND) {.thread.} =
             H:|-[bm]-|
             V:|-[bm]-|
         """
-    #displayQR(panel_qr, "test.bmp")
     layout_qr()
     frame_qr.show()
     app_qr.mainLoop()
@@ -171,10 +164,6 @@ proc createQRThread(hMain: HWND) {.thread.} =
 
 btn_qr.wEvent_Button do ():
     spawn createQRThread(frame.handle)
-    #let a = make_qr_data("abc", Ecc_Low)
-    #echo a
-    #qr_data_to_bmp("test.bmp", a)
-    #displayQR("test.bmp")
 
 layout()
 frame.center()
