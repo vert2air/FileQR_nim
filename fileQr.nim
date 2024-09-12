@@ -3,13 +3,14 @@ import wNim/wNim/[wApp, wBitmap, wButton, wComboBox, wFileDialog, wFrame, wImage
 import qr
 import std/strformat
 import strutils
+import threadpool, winim/lean, sets
     # wMemoryDC,
 
 let app = App(wSystemDpiAware)
 let frame = Frame(title="File <=> QR")
 let panel = Panel(frame)
-let panel_qr = NoteBook(panel)
-panel_qr.addPage("QR code")
+# let panel_qr = NoteBook(panel)
+# panel_qr.addPage("QR code")
 
 proc num2bin2(number: int): string =
     var buffer: array[2, string]
@@ -82,17 +83,6 @@ proc qr_data_to_bmp(bmp_fn: string, qrbin: seq[string]) =
             for ix in (3 * line_len mod 4) ..< 4:
                 f.write(fmt"{char(0x00)}")
 
-var bm = StaticBitmap(panel_qr.page(0), bitmap=Bitmap("test.bmp"), style=wSbFit)
-
-proc displayQR(bmp_fn: string) =
-    bm = StaticBitmap(panel_qr.page(0), bitmap=Bitmap(bmp_fn), style=wSbFit)
-    bm.backgroundColor = -1
-    #var memDc = MemoryDC()
-    #var img = images[0]
-    #memDc.clear()
-    #memDc.drawImage(img, x=0, y=0)
-    panel.refresh()
-
     
 
 frame.dpiAutoScale:
@@ -141,29 +131,50 @@ proc layout() =
         outer: box_QR
         H:|-[label_err]-[cb_err]-|
         H:|-[btn_qr]-|
-        H:|-[panel_qr]-|
-        V:|-[panel_qr]-[label_err,cb_err]-[btn_qr]-|
+        V:|-[label_err,cb_err]-[btn_qr]-|
 
         outer: box_decode
         H:|-[btn_decode]-|
         V:|-[btn_decode]-|
     """
     # V:|-[label_err,cb_err]-[btn_qr]-[panel_qr]-|
-    panel_qr.autolayout """
-        H:|-[bm]-|
-        V:|-[bm]-|
-    """
     box_output.contain(box_QR, box_decode)
 
 btn_input.wEvent_Button do ():
     let input_file_name: seq[string] = file_sel.display()
     input_file.setValue(input_file_name[0])
 
-btn_qr.wEvent_Button do ():
+# var bm = StaticBitmap(panel_qr.page(0), bitmap=Bitmap("test.bmp"), style=wSbFit)
+
+proc createQRThread(hMain: HWND) {.thread.} =
+  {.gcsafe.}:
+    let threadId = GetCurrentThreadId()
+    echo threadId, " thread started"
+
+    var app_qr = App()
+    var frame_qr = Frame(title="QR code", size=(400, 300))
+    var panel_qr = Panel(frame_qr)
     let a = make_qr_data("abc", Ecc_Low)
-    echo a
     qr_data_to_bmp("test.bmp", a)
-    displayQR("test.bmp")
+    let bm = StaticBitmap(panel_qr, bitmap=Bitmap("test.bmp"), style=wSbFit)
+    bm.backgroundColor = -1
+    proc layout_qr() =
+        panel_qr.autolayout """
+            H:|-[bm]-|
+            V:|-[bm]-|
+        """
+    #displayQR(panel_qr, "test.bmp")
+    layout_qr()
+    frame_qr.show()
+    app_qr.mainLoop()
+    echo "HERE"
+
+btn_qr.wEvent_Button do ():
+    spawn createQRThread(frame.handle)
+    #let a = make_qr_data("abc", Ecc_Low)
+    #echo a
+    #qr_data_to_bmp("test.bmp", a)
+    #displayQR("test.bmp")
 
 layout()
 frame.center()
