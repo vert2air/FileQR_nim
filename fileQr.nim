@@ -132,8 +132,15 @@ proc layout() =
 btn_input.wEvent_Button do ():
     let input_file_name: seq[string] = file_sel.display()
     input_file.setValue(input_file_name[0])
+    if rb_file.value == true:
+        if input_file.value.len() > 0:
+            btn_qr.enable()
+            btn_decode.enable()
+        else:
+            btn_qr.disable()
+            btn_decode.enable()
 
-proc createQRThread(data_file_name: string) =
+proc popupQR(data_file_name: string) =
     var frame_qr = Frame(title="QR code", size=(400, 400))
     var panel_qr = Panel(frame_qr)
     block:
@@ -154,9 +161,30 @@ proc createQRThread(data_file_name: string) =
         layout_qr()
         frame_qr.show()
 
+rb_file.value = true
+btn_qr.disable()
+btn_decode.disable()
+
+rb_file.wEvent_RadioButton do ():
+    echo "Radio button: file clicked."
+    input_file.enable()
+    btn_input.enable()
+    input_text.disable()
+
+rb_text.wEvent_RadioButton do ():
+    echo "Radio button: text clicked."
+    input_file.disable()
+    btn_input.disable()
+    input_text.enable()
 
 btn_qr.wEvent_Button do ():
-    createQRThread(input_file.value)
+    var in_data: string = ""
+    if rb_file.value == true and input_file.value.len() > 0:
+        in_data = input_file.value
+    elif rb_text.value == true:
+        in_data = input_text.value
+    if in_data.len() > 0:
+        popupQR(input_file.value)
 
 layout()
 frame.center()
