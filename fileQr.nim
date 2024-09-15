@@ -1,8 +1,14 @@
 import wNim/wNim/[wApp, wBitmap, wButton, wComboBox, wFileDialog, wFrame, wImage, wNoteBook,
     wPanel, wRadioButton, wStaticBitmap, wStaticBox, wStaticText, wStatusBar, wTextCtrl, ]
 import qr
-import std/strformat
-import strutils
+import std/[base64, paths, strformat, sha1, strutils, tables]
+
+let list_err = {
+    "L( 7%)": (Ecc_LOW,      2_953),
+    "M(15%)": (Ecc_MEDIUM,   2_331),
+    "Q(25%)": (Ecc_QUARTILE, 1_663),
+    "H(30%)": (Ecc_HIGH,     1_272),
+}.toOrderedTable
 
 let app = App(wSystemDpiAware)
 let frame = Frame(title="File <=> QR")
@@ -22,11 +28,29 @@ proc num2bin4(number: int): string =
     buffer[3] = fmt"{char((number shr 24) and 0xff)}"
     return buffer.join()
 
-proc make_qr_data(data: string, err_cor: enum): seq[string] =
+proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[string] =
     result = @[]
-    for line in qrBinary(data).splitLines:   # , eccLevel=Ecc_Low)
-        if line.len > 0:
-            result.insert(line, 0)
+    let base64data: string = data.encode()
+    let baseName: string = fileName.lastPathPart().string()
+    let size_per_qr: int = list_err[err_cor][1] - fmt"abcd:001:100:{baseName}:".len()
+    let qrHash: string = ($secureHash(base64data & err_cor))[0..4]
+    let last_len: int = base64data.len() mod size_per_qr
+    let last_idx: int = (base64data.len() + size_per_qr - 1)div size_per_qr
+
+    var idx = 0
+    for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
+        result.insert(qrBinary(
+            fmt"{qrHash}:{idx:03d}:{last_idx:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
+            eccLevel=list_err[err_cor][0]), 0)
+        idx += 1
+    if last_len > 0:
+        result.insert(qrBinary(
+            fmt"{qrHash}:{idx:03d}:{last_idx:03d}:{baseName}:" & base64data[idx * size_per_qr .. ^1],
+            eccLevel=list_err[err_cor][0]), 0)
+
+    # for line in qrBinary(data, eccLevel=list_err[err_cor][0]).splitLines:
+    #    if line.len > 0:
+    #        result.insert(line, 0)
 
 proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
     let line_len = qrbin.find("\n")
@@ -38,10 +62,15 @@ proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
         f.write(fmt"{line_len} {line_len}" & "\n")
         f.write(qrbin)
 
-proc qr_data_to_bmp(bmp_fn: string, qrbin: seq[string]) =
+proc qr_data_to_bmp(bmp_fn: string, qrbin: string) =
     # BMPファイルフォーマット
     # https://www.setsuki.com/hsp/ext/bmp.htm
-    let line_len = qrbin.len
+    let qrLine = qrbin.splitLines
+
+    var line_count = 0
+    for line in qrLine:
+        if line.len() > 0:
+            line_count += 1
 
     block:
         var f: File = open(bmp_fn, FileMode.fmWrite)
@@ -49,15 +78,15 @@ proc qr_data_to_bmp(bmp_fn: string, qrbin: seq[string]) =
             f.close()
         f.write('B') # bfType
         f.write('M') # bfType
-        let data_size: int = ((3 * line_len + 3) div 4) * 4 * line_len
+        let data_size: int = ((3 * line_count + 3) div 4) * 4 * line_count
         f.write(num2bin4(14 + 40 + data_size)) # bfSize
         f.write(num2bin2(0)) # bfReserved1
         f.write(num2bin2(0)) # bfReserved2
         f.write(num2bin4(14 + 40)) # bfOffBits
 
         f.write(num2bin4(40)) # bcSize
-        f.write(num2bin4(line_len)) # bcWidth
-        f.write(num2bin4(line_len)) # bcHeight
+        f.write(num2bin4(line_count)) # bcWidth
+        f.write(num2bin4(line_count)) # bcHeight
         f.write(num2bin2(1)) # bcPlanes
         f.write(num2bin2(24)) # bcBitCount
 
@@ -68,14 +97,16 @@ proc qr_data_to_bmp(bmp_fn: string, qrbin: seq[string]) =
         f.write(num2bin4(0)) # biClrUsed
         f.write(num2bin4(0)) # biClrImportant
 
-        for line in qrbin:
+        for line in qrLine:
+            if line.len() == 0:
+                continue
             for ch in line:
                 case ch:
                 of '0': f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
                 of '1': f.write(fmt"{char(0x00)}{char(0x00)}{char(0x00)}")
                 else:
                     echo "skip 1 char"
-            for ix in (3 * line_len mod 4) ..< 4:
+            for ix in (3 * line_count mod 4) ..< 4:
                 f.write(fmt"{char(0x00)}")
 
     
@@ -101,8 +132,10 @@ let file_sel = FileDialog(panel, message="Open...")
 let input_text = TextCtrl(panel)
 
 let label_err = StaticText(panel, label="Error correct")
-let list_err = ["L(7%)", "M(15%)", "Q(25%)", "H(30%)"]
-let cb_err = ComboBox(panel, value=list_err[0], choices=list_err)
+var choices: seq[string] = @[]
+for k, v in list_err:
+    choices.add(fmt"{k} {v[1]} bytes")
+let cb_err = ComboBox(panel, value=choices[low(choices)], choices=choices) # [list_err.values().tolist()])
 let btn_qr = Button(panel, label="Display QR codes")
 
 let btn_decode = Button(panel, label="Output Decode file")
@@ -140,17 +173,22 @@ btn_input.wEvent_Button do ():
             btn_qr.disable()
             btn_decode.enable()
 
-proc popupQR(data_file_name: string) =
+proc popupQR(data_file_name: Path) =
     var frame_qr = Frame(title="QR code", size=(400, 400))
     var panel_qr = Panel(frame_qr)
     block:
-        var f: File = open(data_file_name, FileMode.fmRead)
+        var f: File = open(data_file_name.string(), FileMode.fmRead)
         defer:
             f.close()
         let data = f.readAll()
-        let a = make_qr_data(data, Ecc_Low)
+        var err_level: string = ""
+        for k, v in list_err:
+            if cb_err.value().startsWith(k):
+                err_level = k
+        #cb_err.value()
+        let a = make_qr_data(data_file_name, data, err_level)
         const qr_file_name = "test.bmp"
-        qr_data_to_bmp(qr_file_name, a)
+        qr_data_to_bmp(qr_file_name, a[0])
         let bm = StaticBitmap(panel_qr, bitmap=Bitmap(qr_file_name), style=wSbFit)
         bm.backgroundColor = -1
         proc layout_qr() =
@@ -184,7 +222,7 @@ btn_qr.wEvent_Button do ():
     elif rb_text.value == true:
         in_data = input_text.value
     if in_data.len() > 0:
-        popupQR(input_file.value)
+        popupQR(input_file.value.Path())
 
 layout()
 frame.center()
