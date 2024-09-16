@@ -1,7 +1,8 @@
 import wNim/wNim/[wApp, wBitmap, wButton, wComboBox, wFileDialog, wFrame, wImage, wNoteBook,
     wPanel, wRadioButton, wStaticBitmap, wStaticBox, wStaticText, wStatusBar, wTextCtrl, ]
 import qr
-import std/[base64, paths, strformat, sha1, strutils, tables]
+import std/[base64, paths, strformat, strutils, tables]
+import checksums/sha1
 
 let list_err = {
     "L( 7%)": (Ecc_LOW,      2_953),
@@ -28,29 +29,33 @@ proc num2bin4(number: int): string =
     buffer[3] = fmt"{char((number shr 24) and 0xff)}"
     return buffer.join()
 
-proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[string] =
+proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string]] =
     result = @[]
     let base64data: string = data.encode()
     let baseName: string = fileName.lastPathPart().string()
     let size_per_qr: int = list_err[err_cor][1] - fmt"abcd:001:100:{baseName}:".len()
-    let qrHash: string = ($secureHash(base64data & err_cor))[0..4]
+    let qrHash: string = ($secureHash(base64data & err_cor))[0..3]
     let last_len: int = base64data.len() mod size_per_qr
-    let last_idx: int = (base64data.len() + size_per_qr - 1)div size_per_qr
+    let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
 
     var idx = 0
     for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
-        result.insert(qrBinary(
-            fmt"{qrHash}:{idx:03d}:{last_idx:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
-            eccLevel=list_err[err_cor][0]), 0)
+        var qrOrder: seq[string] = @[]
+        for qrRevLine in qrBinary(
+                fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
+                eccLevel=list_err[err_cor][0]).splitLines:
+            if qrRevLine.len() > 0:
+                qrOrder.insert(qrRevLine, 0)
+        result.add(qrOrder)
         idx += 1
     if last_len > 0:
-        result.insert(qrBinary(
-            fmt"{qrHash}:{idx:03d}:{last_idx:03d}:{baseName}:" & base64data[idx * size_per_qr .. ^1],
-            eccLevel=list_err[err_cor][0]), 0)
-
-    # for line in qrBinary(data, eccLevel=list_err[err_cor][0]).splitLines:
-    #    if line.len > 0:
-    #        result.insert(line, 0)
+        var qrOrder: seq[string] = @[]
+        for qrRevLine in qrBinary(
+                fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[idx * size_per_qr .. ^1],
+                eccLevel=list_err[err_cor][0]).splitLines:
+            if qrRevLine.len() > 0:
+                qrOrder.insert(qrRevLine, 0)
+        result.add(qrOrder)
 
 proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
     let line_len = qrbin.find("\n")
@@ -62,16 +67,10 @@ proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
         f.write(fmt"{line_len} {line_len}" & "\n")
         f.write(qrbin)
 
-proc qr_data_to_bmp(bmp_fn: string, qrbin: string) =
+proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string]) =
     # BMPファイルフォーマット
     # https://www.setsuki.com/hsp/ext/bmp.htm
-    let qrLine = qrbin.splitLines
-
-    var line_count = 0
-    for line in qrLine:
-        if line.len() > 0:
-            line_count += 1
-
+    var line_count = qrLine.len()
     block:
         var f: File = open(bmp_fn, FileMode.fmWrite)
         defer:
@@ -174,7 +173,7 @@ btn_input.wEvent_Button do ():
             btn_decode.enable()
 
 proc popupQR(data_file_name: Path) =
-    var frame_qr = Frame(title="QR code", size=(400, 400))
+    var frame_qr = Frame(title="QR code", size=(800, 800))
     var panel_qr = Panel(frame_qr)
     block:
         var f: File = open(data_file_name.string(), FileMode.fmRead)
@@ -185,7 +184,6 @@ proc popupQR(data_file_name: Path) =
         for k, v in list_err:
             if cb_err.value().startsWith(k):
                 err_level = k
-        #cb_err.value()
         let a = make_qr_data(data_file_name, data, err_level)
         const qr_file_name = "test.bmp"
         qr_data_to_bmp(qr_file_name, a[0])
