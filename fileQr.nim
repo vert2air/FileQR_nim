@@ -173,8 +173,11 @@ btn_input.wEvent_Button do ():
             btn_decode.enable()
 
 proc popupQR(data_file_name: Path) =
-    var frame_qr = Frame(title="QR code", size=(800, 800))
+    var frame_qr = Frame(title="QR code", size=(900, 800))
     var panel_qr = Panel(frame_qr)
+    var btn_head = Button(frame_qr, label="▲▲")
+    var btn_next = Button(frame_qr, label="▼")
+    var btn_tail = Button(frame_qr, label="▼▼")
     block:
         var f: File = open(data_file_name.string(), FileMode.fmRead)
         defer:
@@ -191,8 +194,9 @@ proc popupQR(data_file_name: Path) =
         bm.backgroundColor = -1
         proc layout_qr() =
             panel_qr.autolayout """
-                H:|-[bm]-|
-                V:|-[bm]-|
+                H:|-[btn_head,btn_next,btn_tail]-[bm]-|
+                V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
+                V:|-[bm(=bm.width)]-|
             """
         layout_qr()
         frame_qr.show()
