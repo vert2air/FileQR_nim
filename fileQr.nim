@@ -170,36 +170,67 @@ btn_input.wEvent_Button do ():
             btn_decode.enable()
         else:
             btn_qr.disable()
-            btn_decode.enable()
+            btn_decode.disable()
+
+var frame_qr = Frame(title="QR code", size=(900, 800))
+var panel_qr = Panel(frame_qr)
+var btn_head = Button(frame_qr, label="▲▲")
+var btn_next = Button(frame_qr, label="▼")
+var btn_tail = Button(frame_qr, label="▼▼")
+var idx = 0
+var bm: wStaticBitmap = nil
+const qr_file_name = "test.bmp"
+var qr_codes: seq[seq[string]]
+proc displayQr(idx: int)
 
 proc popupQR(data_file_name: Path) =
-    var frame_qr = Frame(title="QR code", size=(900, 800))
-    var panel_qr = Panel(frame_qr)
-    var btn_head = Button(frame_qr, label="▲▲")
-    var btn_next = Button(frame_qr, label="▼")
-    var btn_tail = Button(frame_qr, label="▼▼")
-    block:
-        var f: File = open(data_file_name.string(), FileMode.fmRead)
-        defer:
-            f.close()
-        let data = f.readAll()
-        var err_level: string = ""
-        for k, v in list_err:
-            if cb_err.value().startsWith(k):
-                err_level = k
-        let a = make_qr_data(data_file_name, data, err_level)
-        const qr_file_name = "test.bmp"
-        qr_data_to_bmp(qr_file_name, a[0])
-        let bm = StaticBitmap(panel_qr, bitmap=Bitmap(qr_file_name), style=wSbFit)
-        bm.backgroundColor = -1
-        proc layout_qr() =
-            panel_qr.autolayout """
-                H:|-[btn_head,btn_next,btn_tail]-[bm]-|
-                V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
-                V:|-[bm(=bm.width)]-|
-            """
-        layout_qr()
-        frame_qr.show()
+  block:
+    var f: File = open(data_file_name.string(), FileMode.fmRead)
+    defer:
+      f.close()
+    let data = f.readAll()
+    var err_level: string = ""
+    for k, v in list_err:
+      if cb_err.value().startsWith(k):
+        err_level = k
+    qr_codes = make_qr_data(data_file_name, data, err_level)
+  displayQr(0)
+  frame_qr.show()
+
+proc layout_qr() =
+    echo "layout_qr HERE 1"
+    if bm != nil:
+        echo "layout_qr HERE 2"
+    panel_qr.autolayout """
+        H:|-[btn_head,btn_next,btn_tail]-[bm]-|
+        V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
+        V:|-[bm(=bm.width)]-|
+    """
+    echo "layout_qr HERE 3"
+
+proc displayQr(idx: int) =
+    echo "displayQr HERE 1"
+    qr_data_to_bmp(qr_file_name, qr_codes[idx])
+    bm = StaticBitmap(panel_qr, bitmap=Bitmap(qr_file_name), style=wSbFit)
+    bm.backgroundColor = -1
+    echo "displayQr HERE 2"
+    layout_qr()
+    echo "displayQr HERE 3"
+
+btn_head.wEvent_Button do ():
+    echo "btn_head"
+    idx = 0
+    displayQr(idx)
+
+btn_next.wEvent_Button do ():
+    echo "btn_next"
+    idx += 1
+    displayQr(idx)
+
+btn_tail.wEvent_Button do ():
+    echo "btn_tail"
+    idx = high(qr_codes)
+    displayQr(idx)
 
 rb_file.value = true
 btn_qr.disable()
