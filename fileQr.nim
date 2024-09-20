@@ -1,4 +1,5 @@
-import wNim/wNim/[wApp, wBitmap, wButton, wComboBox, wFileDialog, wFrame, wImage, wNoteBook,
+import wNim/wNim/[wApp, wBitmap, wBrush, wButton, wComboBox, wFileDialog, wFrame, wImage,
+    wMemoryDC, wNoteBook, wPaintDC,
     wPanel, wRadioButton, wStaticBitmap, wStaticBox, wStaticText, wStatusBar, wTextCtrl, ]
 import qr
 import std/[base64, paths, strformat, strutils, tables]
@@ -67,48 +68,52 @@ proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
         f.write(fmt"{line_len} {line_len}" & "\n")
         f.write(qrbin)
 
-proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string]) =
-    # BMPファイルフォーマット
-    # https://www.setsuki.com/hsp/ext/bmp.htm
-    var line_count = qrLine.len()
-    block:
-        var f: File = open(bmp_fn, FileMode.fmWrite)
-        defer:
-            f.close()
-        f.write('B') # bfType
-        f.write('M') # bfType
-        let data_size: int = ((3 * line_count + 3) div 4) * 4 * line_count
-        f.write(num2bin4(14 + 40 + data_size)) # bfSize
-        f.write(num2bin2(0)) # bfReserved1
-        f.write(num2bin2(0)) # bfReserved2
-        f.write(num2bin4(14 + 40)) # bfOffBits
+proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1) =
+  # BMPファイルフォーマット
+  # https://www.setsuki.com/hsp/ext/bmp.htm
+  var line_count = qrLine.len()
+  block:
+    var f: File = open(bmp_fn, FileMode.fmWrite)
+    defer:
+      f.close()
+    f.write('B') # bfType
+    f.write('M') # bfType
+    # let data_size: int = ((3 * line_count + 3) div 4) * 4 * line_count
+    let data_size: int = ((3 * line_count * magnify + 3) div 4) * 4 * line_count * magnify
+    f.write(num2bin4(14 + 40 + data_size)) # bfSize
+    f.write(num2bin2(0)) # bfReserved1
+    f.write(num2bin2(0)) # bfReserved2
+    f.write(num2bin4(14 + 40)) # bfOffBits
 
-        f.write(num2bin4(40)) # bcSize
-        f.write(num2bin4(line_count)) # bcWidth
-        f.write(num2bin4(line_count)) # bcHeight
-        f.write(num2bin2(1)) # bcPlanes
-        f.write(num2bin2(24)) # bcBitCount
+    f.write(num2bin4(40)) # bcSize
+    f.write(num2bin4(line_count * magnify)) # bcWidth
+    f.write(num2bin4(line_count * magnify)) # bcHeight
+    f.write(num2bin2(1)) # bcPlanes
+    f.write(num2bin2(24)) # bcBitCount
 
-        f.write(num2bin4(0)) # biComression 0:BI_RGB
-        f.write(num2bin4(data_size)) # biSizeImage
-        f.write(num2bin4(0)) # biXPixPerMeter
-        f.write(num2bin4(0)) # biYPixPerMeter
-        f.write(num2bin4(0)) # biClrUsed
-        f.write(num2bin4(0)) # biClrImportant
+    f.write(num2bin4(0)) # biComression 0:BI_RGB
+    f.write(num2bin4(data_size)) # biSizeImage
+    f.write(num2bin4(0)) # biXPixPerMeter
+    f.write(num2bin4(0)) # biYPixPerMeter
+    f.write(num2bin4(0)) # biClrUsed
+    f.write(num2bin4(0)) # biClrImportant
 
-        for line in qrLine:
-            if line.len() == 0:
-                continue
-            for ch in line:
-                case ch:
-                of '0': f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
-                of '1': f.write(fmt"{char(0x00)}{char(0x00)}{char(0x00)}")
-                else:
-                    echo "skip 1 char"
-            for ix in (3 * line_count mod 4) ..< 4:
-                f.write(fmt"{char(0x00)}")
-
-    
+    for line in qrLine:
+      if line.len() == 0:
+        continue
+      for mag in [1 .. magnify]:
+        for ch in line:
+          case ch:
+          of '0':
+            for mag in [1 .. magnify]:
+              f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
+          of '1':
+            for mag in [1 .. magnify]:
+              f.write(fmt"{char(0x00)}{char(0x00)}{char(0x00)}")
+          else:
+            echo "skip 1 char"
+        for ix in (3 * line_count mod 4) ..< 4:
+          f.write(fmt"{char(0x00)}")
 
 frame.dpiAutoScale:
     frame.size = (750, 450)
@@ -172,16 +177,61 @@ btn_input.wEvent_Button do ():
             btn_qr.disable()
             btn_decode.disable()
 
-var frame_qr = Frame(title="QR code", size=(900, 800))
+var frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
+var panel_qr_ctl = Panel(frame_qr_ctl)
+var frame_qr = Frame(title="QR code", size=(800, 800))
 var panel_qr = Panel(frame_qr)
-var btn_head = Button(frame_qr, label="▲▲")
-var btn_next = Button(frame_qr, label="▼")
-var btn_tail = Button(frame_qr, label="▼▼")
-var idx = 0
-var bm: wStaticBitmap = nil
+var btn_head = Button(panel_qr_ctl, label="▲▲")
+var btn_next = Button(panel_qr_ctl, label="▼")
+var btn_tail = Button(panel_qr_ctl, label="▼▼")
+var idx: int = 0
+#var bm: wStaticBitmap = nil
+#var bm: wBitmap = nil
+var bm: wImage = nil
 const qr_file_name = "test.bmp"
 var qr_codes: seq[seq[string]]
-proc displayQr(idx: int)
+var memDc = MemoryDC()
+
+#[
+proc layout_qr() =
+  echo "layout_qr HERE 1"
+  if memDc != nil:
+    echo "layout_qr HERE 2"
+    panel_qr.autolayout """
+      H:|-[btn_head,btn_next,btn_tail]-[memDc]-|
+      V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
+      V:|-[memDc(=memDc.width)]-|
+    """
+  echo "layout_qr HERE 3"
+]#
+proc layout_qr_ctl() =
+  panel_qr_ctl.autolayout """
+    H:|-[btn_head,btn_next,btn_tail]-|
+    V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
+  """
+
+proc displayQr(idx: int) =
+    qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=2)
+    #bm = StaticBitmap(panel_qr, bitmap=Bitmap(fmt"{qr_file_name}{idx}"), style=wSbFit)
+    # bm = Bitmap(fmt"{qr_file_name}{idx}")
+    bm = Image(fmt"{qr_file_name}{idx}")
+    # bm = bm.scale((width: bm.size.width * 2, height: bm.size.height * 2))
+    # bm.backgroundColor = -1
+    memDc.selectObject(Bitmap((width: bm.size.width + 50, height: bm.size.height + 50)))
+    memDc.clear()
+    memDc.setBackground(wWhiteBrush)
+    memDc.setBrush(wWhiteBrush)
+    memDc.drawImage(bm, 10, 10)
+    panel_qr.center()
+    frame_qr.show()
+    panel_qr.refresh()
+    layout_qr_ctl()
+    frame_qr_ctl.show()
+
+panel_qr.wEvent_Paint do ():
+  var dc = PaintDC(panel_qr)
+  dc.blit(source=memDc, xdest=0, ydest=0, width=bm.getSize().width + 50, height=bm.getSize().height + 50)
+  dc.delete
 
 proc popupQR(data_file_name: Path) =
   block:
@@ -195,27 +245,6 @@ proc popupQR(data_file_name: Path) =
         err_level = k
     qr_codes = make_qr_data(data_file_name, data, err_level)
   displayQr(0)
-  frame_qr.show()
-
-proc layout_qr() =
-    echo "layout_qr HERE 1"
-    if bm != nil:
-        echo "layout_qr HERE 2"
-    panel_qr.autolayout """
-        H:|-[btn_head,btn_next,btn_tail]-[bm]-|
-        V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
-        V:|-[bm(=bm.width)]-|
-    """
-    echo "layout_qr HERE 3"
-
-proc displayQr(idx: int) =
-    echo "displayQr HERE 1"
-    qr_data_to_bmp(qr_file_name, qr_codes[idx])
-    bm = StaticBitmap(panel_qr, bitmap=Bitmap(qr_file_name), style=wSbFit)
-    bm.backgroundColor = -1
-    echo "displayQr HERE 2"
-    layout_qr()
-    echo "displayQr HERE 3"
 
 btn_head.wEvent_Button do ():
     echo "btn_head"
