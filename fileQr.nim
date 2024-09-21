@@ -99,20 +99,18 @@ proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1) =
     f.write(num2bin4(0)) # biClrImportant
 
     for line in qrLine:
-      if line.len() == 0:
-        continue
-      for mag in [1 .. magnify]:
+      for mag in 1 .. magnify:
         for ch in line:
           case ch:
           of '0':
-            for mag in [1 .. magnify]:
+            for mag in 1 .. magnify:
               f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
           of '1':
-            for mag in [1 .. magnify]:
+            for mag in 1 .. magnify:
               f.write(fmt"{char(0x00)}{char(0x00)}{char(0x00)}")
           else:
             echo "skip 1 char"
-        for ix in (3 * line_count mod 4) ..< 4:
+        for ix in (3 * line_count * magnify mod 4) ..< 4:
           f.write(fmt"{char(0x00)}")
 
 frame.dpiAutoScale:
@@ -211,7 +209,7 @@ proc layout_qr_ctl() =
   """
 
 proc displayQr(idx: int) =
-    qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=2)
+    qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3)
     #bm = StaticBitmap(panel_qr, bitmap=Bitmap(fmt"{qr_file_name}{idx}"), style=wSbFit)
     # bm = Bitmap(fmt"{qr_file_name}{idx}")
     bm = Image(fmt"{qr_file_name}{idx}")
