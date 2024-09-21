@@ -6,10 +6,10 @@ import std/[base64, paths, strformat, strutils, tables]
 import checksums/sha1
 
 let list_err = {
-    "L( 7%)": (Ecc_LOW,      2_953),
-    "M(15%)": (Ecc_MEDIUM,   2_331),
-    "Q(25%)": (Ecc_QUARTILE, 1_663),
-    "H(30%)": (Ecc_HIGH,     1_272),
+  "L( 7%)": (Ecc_LOW,      2_953),
+  "M(15%)": (Ecc_MEDIUM,   2_331),
+  "Q(25%)": (Ecc_QUARTILE, 1_663),
+  "H(30%)": (Ecc_HIGH,     1_272),
 }.toOrderedTable
 
 let app = App(wSystemDpiAware)
@@ -29,42 +29,42 @@ proc num2bin4(number: int): string =
   ].join()
 
 proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string]] =
-    result = @[]
-    let base64data: string = data.encode()
-    let baseName: string = fileName.lastPathPart().string()
-    let size_per_qr: int = list_err[err_cor][1] - fmt"abcd:001:100:{baseName}:".len()
-    let qrHash: string = ($secureHash(base64data & err_cor))[0..3]
-    let last_len: int = base64data.len() mod size_per_qr
-    let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
+  result = @[]
+  let base64data: string = data.encode()
+  let baseName: string = fileName.lastPathPart().string()
+  let size_per_qr: int = list_err[err_cor][1] - fmt"abcd:001:100:{baseName}:".len()
+  let qrHash: string = ($secureHash(base64data & err_cor))[0..3]
+  let last_len: int = base64data.len() mod size_per_qr
+  let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
 
-    var idx = 0
-    for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
-        var qrOrder: seq[string] = @[]
-        for qrRevLine in qrBinary(
-                fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
-                eccLevel=list_err[err_cor][0]).splitLines:
-            if qrRevLine.len() > 0:
-                qrOrder.insert(qrRevLine, 0)
-        result.add(qrOrder)
-        idx += 1
-    if last_len > 0:
-        var qrOrder: seq[string] = @[]
-        for qrRevLine in qrBinary(
-                fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[idx * size_per_qr .. ^1],
-                eccLevel=list_err[err_cor][0]).splitLines:
-            if qrRevLine.len() > 0:
-                qrOrder.insert(qrRevLine, 0)
-        result.add(qrOrder)
+  var idx = 0
+  for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
+    var qrOrder: seq[string] = @[]
+    for qrRevLine in qrBinary(
+            fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
+            eccLevel=list_err[err_cor][0]).splitLines:
+      if qrRevLine.len() > 0:
+        qrOrder.insert(qrRevLine, 0)
+    result.add(qrOrder)
+    idx += 1
+  if last_len > 0:
+    var qrOrder: seq[string] = @[]
+    for qrRevLine in qrBinary(
+              fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[idx * size_per_qr .. ^1],
+              eccLevel=list_err[err_cor][0]).splitLines:
+      if qrRevLine.len() > 0:
+        qrOrder.insert(qrRevLine, 0)
+    result.add(qrOrder)
 
 proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
-    let line_len = qrbin.find("\n")
-    block:
-        let f: File = open(pbm_fn, FileMode.fmWrite)
-        defer:
-            close(f)
-        f.write("P1\n")
-        f.write(fmt"{line_len} {line_len}" & "\n")
-        f.write(qrbin)
+  let line_len = qrbin.find("\n")
+  block:
+    let f: File = open(pbm_fn, FileMode.fmWrite)
+    defer:
+      close(f)
+    f.write("P1\n")
+    f.write(fmt"{line_len} {line_len}" & "\n")
+    f.write(qrbin)
 
 proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margin: int = 20) =
   # BMPファイルフォーマット
@@ -156,37 +156,37 @@ let btn_qr = Button(panel, label="Display QR codes")
 let btn_decode = Button(panel, label="Output Decode file")
 
 proc layout() =
-    panel.autolayout """
-        H:|-40-[box_input]-40-|
-        H:|-40-[box_QR]-[box_decode]-40-|
-        V:|-[box_input]-30-[box_QR,box_decode]-40-|
+  panel.autolayout """
+    H:|-40-[box_input]-40-|
+    H:|-40-[box_QR]-[box_decode]-40-|
+    V:|-[box_input]-30-[box_QR,box_decode]-40-|
 
-        outer: box_input
-        H:|-[rb_file]-[input_file]-[btn_input(75)]-|
-        H:|-[rb_text]-[input_text]-|
-        V:|-[rb_file,input_file,btn_input]-[rb_text, input_text]-|
+    outer: box_input
+    H:|-[rb_file]-[input_file]-[btn_input(75)]-|
+    H:|-[rb_text]-[input_text]-|
+    V:|-[rb_file,input_file,btn_input]-[rb_text, input_text]-|
 
-        outer: box_QR
-        H:|-[label_err]-[cb_err]-|
-        H:|-[btn_qr]-|
-        V:|-[label_err,cb_err]-[btn_qr]-|
+    outer: box_QR
+    H:|-[label_err]-[cb_err]-|
+    H:|-[btn_qr]-|
+    V:|-[label_err,cb_err]-[btn_qr]-|
 
-        outer: box_decode
-        H:|-[btn_decode]-|
-        V:|-[btn_decode]-|
-    """
-    box_output.contain(box_QR, box_decode)
+    outer: box_decode
+    H:|-[btn_decode]-|
+    V:|-[btn_decode]-|
+  """
+  box_output.contain(box_QR, box_decode)
 
 btn_input.wEvent_Button do ():
-    let input_file_name: seq[string] = file_sel.display()
-    input_file.setValue(input_file_name[0])
-    if rb_file.value == true:
-        if input_file.value.len() > 0:
-            btn_qr.enable()
-            btn_decode.enable()
-        else:
-            btn_qr.disable()
-            btn_decode.disable()
+  let input_file_name: seq[string] = file_sel.display()
+  input_file.setValue(input_file_name[0])
+  if rb_file.value == true:
+    if input_file.value.len() > 0:
+      btn_qr.enable()
+      btn_decode.enable()
+    else:
+      btn_qr.disable()
+      btn_decode.disable()
 
 let frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
 let panel_qr_ctl = Panel(frame_qr_ctl)
@@ -208,19 +208,19 @@ proc layout_qr_ctl() =
   """
 
 proc displayQr(idx: int) =
-    qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3, margin=20)
-    bm = Image(fmt"{qr_file_name}{idx}")
-    # bm.backgroundColor = -1
-    memDc.selectObject(Bitmap(bm.size))
-    memDc.clear()
-    memDc.setBackground(wWhiteBrush)
-    memDc.setBrush(wWhiteBrush)
-    memDc.drawImage(bm, 0, 0)
-    panel_qr.center()
-    frame_qr.show()
-    panel_qr.refresh()
-    layout_qr_ctl()
-    frame_qr_ctl.show()
+  qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3, margin=20)
+  bm = Image(fmt"{qr_file_name}{idx}")
+  # bm.backgroundColor = -1
+  memDc.selectObject(Bitmap(bm.size))
+  memDc.clear()
+  memDc.setBackground(wWhiteBrush)
+  memDc.setBrush(wWhiteBrush)
+  memDc.drawImage(bm, 0, 0)
+  panel_qr.center()
+  frame_qr.show()
+  panel_qr.refresh()
+  layout_qr_ctl()
+  frame_qr_ctl.show()
 
 panel_qr.wEvent_Paint do ():
   var dc = PaintDC(panel_qr)
@@ -258,25 +258,23 @@ btn_qr.disable()
 btn_decode.disable()
 
 rb_file.wEvent_RadioButton do ():
-    echo "Radio button: file clicked."
-    input_file.enable()
-    btn_input.enable()
-    input_text.disable()
+  input_file.enable()
+  btn_input.enable()
+  input_text.disable()
 
 rb_text.wEvent_RadioButton do ():
-    echo "Radio button: text clicked."
-    input_file.disable()
-    btn_input.disable()
-    input_text.enable()
+  input_file.disable()
+  btn_input.disable()
+  input_text.enable()
 
 btn_qr.wEvent_Button do ():
-    var in_data: string = ""
-    if rb_file.value == true and input_file.value.len() > 0:
-        in_data = input_file.value
-    elif rb_text.value == true:
-        in_data = input_text.value
-    if in_data.len() > 0:
-        popupQR(input_file.value.Path())
+  var in_data: string = ""
+  if rb_file.value == true and input_file.value.len() > 0:
+    in_data = input_file.value
+  elif rb_text.value == true:
+    in_data = input_text.value
+  if in_data.len() > 0:
+    popupQR(input_file.value.Path())
 
 layout()
 frame.center()
