@@ -1,6 +1,6 @@
-import wNim/wNim/[wApp, wBitmap, wBrush, wButton, wComboBox, wFileDialog, wFrame, wImage,
-    wMemoryDC, wNoteBook, wPaintDC,
-    wPanel, wRadioButton, wStaticBitmap, wStaticBox, wStaticText, wStatusBar, wTextCtrl, ]
+import wNim/wNim/[wApp, wBitmap, wBrush, wButton, wComboBox, wFileDialog,
+  wFrame, wImage, wMemoryDC, wPaintDC, wPanel, wRadioButton, wStaticBox,
+  wStaticText, wStatusBar, wTextCtrl, ]
 import qr
 import std/[base64, paths, strformat, strutils, tables]
 import checksums/sha1
@@ -17,18 +17,16 @@ let frame = Frame(title="File <=> QR")
 let panel = Panel(frame)
 
 proc num2bin2(number: int): string =
-    var buffer: array[2, string]
-    buffer[0] = fmt"{char((number shr  0) and 0xff)}"
-    buffer[1] = fmt"{char((number shr  8) and 0xff)}"
-    return buffer.join()
+  [ fmt"{char((number shr  0) and 0xff)}",
+    fmt"{char((number shr  8) and 0xff)}",
+  ].join()
 
 proc num2bin4(number: int): string =
-    var buffer: array[4, string]
-    buffer[0] = fmt"{char((number shr  0) and 0xff)}"
-    buffer[1] = fmt"{char((number shr  8) and 0xff)}"
-    buffer[2] = fmt"{char((number shr 16) and 0xff)}"
-    buffer[3] = fmt"{char((number shr 24) and 0xff)}"
-    return buffer.join()
+  [ fmt"{char((number shr  0) and 0xff)}",
+    fmt"{char((number shr  8) and 0xff)}",
+    fmt"{char((number shr 16) and 0xff)}",
+    fmt"{char((number shr 24) and 0xff)}",
+  ].join()
 
 proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string]] =
     result = @[]
@@ -61,7 +59,7 @@ proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string
 proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
     let line_len = qrbin.find("\n")
     block:
-        var f: File = open(pbm_fn, FileMode.fmWrite)
+        let f: File = open(pbm_fn, FileMode.fmWrite)
         defer:
             close(f)
         f.write("P1\n")
@@ -74,7 +72,7 @@ proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margi
   let line_count = qrLine.len()
   let bmp_size: int = line_count * magnify + 2 * margin
   block:
-    var f: File = open(bmp_fn, FileMode.fmWrite)
+    let f: File = open(bmp_fn, FileMode.fmWrite)
     defer:
       f.close()
     f.write('B') # bfType
@@ -190,13 +188,13 @@ btn_input.wEvent_Button do ():
             btn_qr.disable()
             btn_decode.disable()
 
-var frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
-var panel_qr_ctl = Panel(frame_qr_ctl)
-var frame_qr = Frame(title="QR code", size=(600, 630))
-var panel_qr = Panel(frame_qr)
-var btn_head = Button(panel_qr_ctl, label="▲▲")
-var btn_next = Button(panel_qr_ctl, label="▼")
-var btn_tail = Button(panel_qr_ctl, label="▼▼")
+let frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
+let panel_qr_ctl = Panel(frame_qr_ctl)
+let frame_qr = Frame(title="QR code", size=(600, 630))
+let panel_qr = Panel(frame_qr)
+let btn_head = Button(panel_qr_ctl, label="▲▲")
+let btn_next = Button(panel_qr_ctl, label="▼")
+let btn_tail = Button(panel_qr_ctl, label="▼▼")
 var idx: int = 0
 var bm: wImage = nil
 const qr_file_name = "test.bmp"
@@ -231,7 +229,7 @@ panel_qr.wEvent_Paint do ():
 
 proc popupQR(data_file_name: Path) =
   block:
-    var f: File = open(data_file_name.string(), FileMode.fmRead)
+    let f: File = open(data_file_name.string(), FileMode.fmRead)
     defer:
       f.close()
     let data = f.readAll()
@@ -286,4 +284,3 @@ layout()
 frame.center()
 frame.show()
 app.mainLoop()
-        
