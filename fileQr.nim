@@ -241,19 +241,17 @@ proc popupQR(data_file_name: Path) =
   displayQr(0)
 
 btn_head.wEvent_Button do ():
-    echo "btn_head"
-    idx = 0
-    displayQr(idx)
+  idx = low(qr_codes)
+  displayQr(idx)
 
 btn_next.wEvent_Button do ():
-    echo "btn_next"
+  if idx < high(qr_codes):
     idx += 1
-    displayQr(idx)
+  displayQr(idx)
 
 btn_tail.wEvent_Button do ():
-    echo "btn_tail"
-    idx = high(qr_codes)
-    displayQr(idx)
+  idx = high(qr_codes)
+  displayQr(idx)
 
 rb_file.value = true
 btn_qr.disable()
