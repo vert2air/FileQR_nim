@@ -37,20 +37,18 @@ proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string
   let last_len: int = base64data.len() mod size_per_qr
   let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
 
-  var idx = 0
   for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
     var qrOrder: seq[string] = @[]
     for qrRevLine in qrBinary(
-            fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
+            fmt"{qrHash}:{result.len:03d}:{total:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
             eccLevel=list_err[err_cor][0]).splitLines:
       if qrRevLine.len() > 0:
         qrOrder.insert(qrRevLine, 0)
     result.add(qrOrder)
-    idx += 1
   if last_len > 0:
     var qrOrder: seq[string] = @[]
     for qrRevLine in qrBinary(
-              fmt"{qrHash}:{idx:03d}:{total:03d}:{baseName}:" & base64data[idx * size_per_qr .. ^1],
+              fmt"{qrHash}:{result.len:03d}:{total:03d}:{baseName}:" & base64data[result.len * size_per_qr .. ^1],
               eccLevel=list_err[err_cor][0]).splitLines:
       if qrRevLine.len() > 0:
         qrOrder.insert(qrRevLine, 0)
