@@ -3,5 +3,1416 @@
   "overrides": "",
   "plugins": "",
   "resolver": "SemVer",
-  "graph": null
+  "graph": {
+    "nodes": [
+      {
+        "pkg": {
+          "projectName": "portfile_nim",
+          "u": ""
+        },
+        "versions": [
+          {
+            "version": "#head",
+            "commit": "",
+            "req": 2,
+            "v": 0
+          }
+        ],
+        "active": true,
+        "isRoot": true,
+        "isTopLevel": true,
+        "status": 0,
+        "activeVersion": 0,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim"
+      },
+      {
+        "pkg": {
+          "projectName": "wNim",
+          "u": "https://github.com/khchen/wNim"
+        },
+        "versions": [
+          {
+            "version": "1.0.0",
+            "commit": "16105eec911c633e3c994c879e42a43584b6d5b5",
+            "req": 3,
+            "v": 1
+          },
+          {
+            "version": "0.13.5",
+            "commit": "1dee5983972570a27eee6ca49bfb96d4328f9a0e",
+            "req": 3,
+            "v": 2
+          },
+          {
+            "version": "0.13.4",
+            "commit": "27fc2038350689794a947dc1268af13bb74b735e",
+            "req": 3,
+            "v": 3
+          }
+        ],
+        "active": true,
+        "isRoot": true,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": 2,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\wNim"
+      },
+      {
+        "pkg": {
+          "projectName": "nim_qr",
+          "u": "https://github.com/ThomasTJdev/nim_qr"
+        },
+        "versions": [
+          {
+            "version": "1.5.0",
+            "commit": "c86a21bc80731697e0c7f607798dc184d54f6282",
+            "req": 5,
+            "v": 4
+          },
+          {
+            "version": "1.5.0",
+            "commit": "2e54ca37f8cd01327061555d87b1ecb5f730150f",
+            "req": 5,
+            "v": 5
+          },
+          {
+            "version": "1.4.0",
+            "commit": "ca6d7d09b84656bf451188acbbb663746a18970e",
+            "req": 4,
+            "v": 6
+          },
+          {
+            "version": "1.3.1",
+            "commit": "99cdb5dde4172688b1f4899580492ab16eea2f10",
+            "req": 5,
+            "v": 7
+          },
+          {
+            "version": "1.3.1",
+            "commit": "23fb558f2b2985824d66d46ee674f2334ac1b909",
+            "req": 5,
+            "v": 8
+          },
+          {
+            "version": "1.3.1",
+            "commit": "8b1513dca6dd5d7ac340d8521d07bf42a88e1c74",
+            "req": 4,
+            "v": 9
+          },
+          {
+            "version": "1.3.0",
+            "commit": "f4f700bf2a1f8a3b1cbac2cf2c904c734d80b925",
+            "req": 5,
+            "v": 10
+          },
+          {
+            "version": "1.3.0",
+            "commit": "25384666d002c8c01546c2284f52e05f881ce6f3",
+            "req": 5,
+            "v": 11
+          },
+          {
+            "version": "1.2.0",
+            "commit": "54473dbdf8c8377e77088dc2442e9699c2fd799a",
+            "req": 6,
+            "v": 12
+          },
+          {
+            "version": "1.2.0",
+            "commit": "8aa9ecd15aa9f8be2e11102ea8c12ee80afa0c68",
+            "req": 6,
+            "v": 13
+          },
+          {
+            "version": "1.2.0",
+            "commit": "286378c3a7648f345e531e7c23affd6c36cb6502",
+            "req": 6,
+            "v": 14
+          },
+          {
+            "version": "1.2.0",
+            "commit": "4d7f9467248ae561cbb7ef2e9104a0a0ea6a825a",
+            "req": 5,
+            "v": 15
+          },
+          {
+            "version": "1.0.0",
+            "commit": "ae6c42f036fa50daad66dcaeea28f879dd3223ef",
+            "req": 6,
+            "v": 16
+          }
+        ],
+        "active": true,
+        "isRoot": true,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": 12,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\nim_qr"
+      },
+      {
+        "pkg": {
+          "projectName": "checksums",
+          "u": "https://github.com/nim-lang/checksums"
+        },
+        "versions": [
+          {
+            "version": "0.2.1",
+            "commit": "f8f6bd34bfa3fe12c64b919059ad856a96efcba0",
+            "req": 7,
+            "v": 17
+          },
+          {
+            "version": "0.2.0",
+            "commit": "86003da1cebaf8904979579e5ebdfbaa1ce507b4",
+            "req": 7,
+            "v": 18
+          },
+          {
+            "version": "0.1.0",
+            "commit": "7ff0b762332d2591bbeb65df9bb86d52ea44ec01",
+            "req": 7,
+            "v": 19
+          },
+          {
+            "version": "0.1.0",
+            "commit": "c8fca3bd0c264ce9aeee1ea6b078bdf16dfe826d",
+            "req": 8,
+            "v": 20
+          },
+          {
+            "version": "0.1.0",
+            "commit": "95c22c4c3a2d6ee6577f26997c74cf29c1512893",
+            "req": 8,
+            "v": 21
+          },
+          {
+            "version": "0.1.0",
+            "commit": "13b83cefa1b29560aa4927046820c357f59ed5f1",
+            "req": 8,
+            "v": 22
+          }
+        ],
+        "active": true,
+        "isRoot": true,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": 5,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\checksums"
+      },
+      {
+        "pkg": {
+          "projectName": "winim",
+          "u": "https://github.com/khchen/winim"
+        },
+        "versions": [
+          {
+            "version": "3.9.4",
+            "commit": "6fdee629140baa0d7060ddf86662457d11f50d35",
+            "req": 9,
+            "v": 23
+          },
+          {
+            "version": "3.9.3",
+            "commit": "7599a7a7ef1bf2763f5e65a09bc63118b988a87e",
+            "req": 9,
+            "v": 24
+          },
+          {
+            "version": "3.9.2",
+            "commit": "154d6c6ffb1f19fce684381cdba5e3f3a729053e",
+            "req": 9,
+            "v": 25
+          },
+          {
+            "version": "3.9.1",
+            "commit": "313ad151d9e9289213a0c6a30e3a6155cdd63f49",
+            "req": 9,
+            "v": 26
+          },
+          {
+            "version": "3.9.0",
+            "commit": "3abd0ae122cd41efd0ce6d45fea720ef7091e4ac",
+            "req": 9,
+            "v": 27
+          },
+          {
+            "version": "3.8.1",
+            "commit": "bda7de3b63f4644183a2b70cb9163b61e2320f12",
+            "req": 9,
+            "v": 28
+          },
+          {
+            "version": "3.8.0",
+            "commit": "f658fc523a7c8960b2f808d774b0f77cecec86db",
+            "req": 9,
+            "v": 29
+          },
+          {
+            "version": "3.7.2",
+            "commit": "c68e1bbf5c684fe872ff2d84687224078b9e661d",
+            "req": 9,
+            "v": 30
+          },
+          {
+            "version": "3.7.1",
+            "commit": "5460161ec95c9e13812504a0f9b94b08999acf75",
+            "req": 9,
+            "v": 31
+          },
+          {
+            "version": "3.7.0",
+            "commit": "8edc6daa1420cf4d1018be16b2067606bf8f43bf",
+            "req": 9,
+            "v": 32
+          },
+          {
+            "version": "3.6.1",
+            "commit": "b7b32603f4ef672bc34405bc6200e8aab2c366b1",
+            "req": 9,
+            "v": 33
+          },
+          {
+            "version": "3.6.0",
+            "commit": "bffaf742b4603d1f675b4558d250d5bfeb8b6630",
+            "req": 9,
+            "v": 34
+          },
+          {
+            "version": "3.5.0",
+            "commit": "c4759634618b23d40c40ceb5d74e953258ad9573",
+            "req": 9,
+            "v": 35
+          },
+          {
+            "version": "3.4.3",
+            "commit": "69366f0806c331c1716446725450698c6718564b",
+            "req": 9,
+            "v": 36
+          },
+          {
+            "version": "3.4.2",
+            "commit": "c527eae911ca5306fd98a2c7def71283aaa59819",
+            "req": 9,
+            "v": 37
+          },
+          {
+            "version": "3.4.1",
+            "commit": "0a43bd6fc9622a61d8f39c9b628cad295b74063b",
+            "req": 14,
+            "v": 38
+          },
+          {
+            "version": "3.4.0",
+            "commit": "c51f8e5b519cc53a88d45e5be0ca7391fffaf4a1",
+            "req": 14,
+            "v": 39
+          },
+          {
+            "version": "3.3.5",
+            "commit": "e04d192f5d65bd48f8c39f1e18682542941f023d",
+            "req": 14,
+            "v": 40
+          },
+          {
+            "version": "3.3.4",
+            "commit": "13fe51aed1cd1a8cb761a876a29c1561437b9fed",
+            "req": 14,
+            "v": 41
+          },
+          {
+            "version": "3.3.3",
+            "commit": "e73ecec5679a58488d42d35b39ebeb785baa1564",
+            "req": 14,
+            "v": 42
+          },
+          {
+            "version": "3.3.2",
+            "commit": "7161f300ec70d2d777e1597d7ff337f98b1f4186",
+            "req": 14,
+            "v": 43
+          },
+          {
+            "version": "3.3.1",
+            "commit": "545c5a4f0a12f6b6379cc0bbb4d356fec8f51639",
+            "req": 14,
+            "v": 44
+          },
+          {
+            "version": "3.3.0",
+            "commit": "d300192c588f73dddef26e3c317f148aa23465c3",
+            "req": 14,
+            "v": 45
+          },
+          {
+            "version": "3.2.4",
+            "commit": "d32513a175e495049f481fe2a29a6731158356b3",
+            "req": 14,
+            "v": 46
+          },
+          {
+            "version": "3.2.3",
+            "commit": "867fba20591cef0a0cd68fcccb1d1b5b9f41cf55",
+            "req": 14,
+            "v": 47
+          },
+          {
+            "version": "3.2.2",
+            "commit": "42d6fb0f301dfed374d9fb24af252f467e10d426",
+            "req": 14,
+            "v": 48
+          },
+          {
+            "version": "3.2.1",
+            "commit": "b2914ffedfb158e716c401b367be7eae3960b114",
+            "req": 14,
+            "v": 49
+          },
+          {
+            "version": "3.2.0",
+            "commit": "833dd710c8291f1757414ded5d7427da417728ac",
+            "req": 13,
+            "v": 50
+          },
+          {
+            "version": "3.1.1",
+            "commit": "9d4009a43bbdbbda18c32dab65176cff65dc5c18",
+            "req": 13,
+            "v": 51
+          },
+          {
+            "version": "3.1",
+            "commit": "6ad6865bdf19153178973c77b92891b0a1ed5d14",
+            "req": 13,
+            "v": 52
+          },
+          {
+            "version": "3.0",
+            "commit": "bac6a852fc2a0c48b0b5941e029b8f5af7566185",
+            "req": 13,
+            "v": 53
+          },
+          {
+            "version": "2.6.1",
+            "commit": "5b08c86abc0cded2266bd785e8f76904093f4b77",
+            "req": 12,
+            "v": 54
+          },
+          {
+            "version": "2.6",
+            "commit": "f4c20f94cc759e5d7f06dce2d0922eefece9d57a",
+            "req": 12,
+            "v": 55
+          },
+          {
+            "version": "2.5.2",
+            "commit": "4079cdee07e3e8ae927fc2378d7e5d1bb72c3deb",
+            "req": 12,
+            "v": 56
+          },
+          {
+            "version": "2.5.1",
+            "commit": "54323d6b847d23f064bc8f3002556da91094614c",
+            "req": 12,
+            "v": 57
+          },
+          {
+            "version": "2.5",
+            "commit": "52780a2d4ed6d96108846025e6bd70dd08e86217",
+            "req": 12,
+            "v": 58
+          },
+          {
+            "version": "2.5",
+            "commit": "f409e6ad0f9a0e1147204575cd5a7d93d58c2c9e",
+            "req": 12,
+            "v": 59
+          },
+          {
+            "version": "2.4.4",
+            "commit": "4f557015ab9a6575c1ab15bbd73a39bd76677e49",
+            "req": 12,
+            "v": 60
+          },
+          {
+            "version": "2.4.3",
+            "commit": "8384aed6e4672044bb8926b5e5ea50f7c7c0948b",
+            "req": 12,
+            "v": 61
+          },
+          {
+            "version": "2.4.2",
+            "commit": "2b29439051102669592bec7a2f250d5444dc3692",
+            "req": 12,
+            "v": 62
+          },
+          {
+            "version": "2.4.1",
+            "commit": "26c7a277f64c6f28f6428d54a32fcab58d59d5c2",
+            "req": 12,
+            "v": 63
+          },
+          {
+            "version": "2.4",
+            "commit": "a129e1aec106d5a72931f37debc0854fbd73ab4a",
+            "req": 12,
+            "v": 64
+          },
+          {
+            "version": "2.3",
+            "commit": "82eeb099de5331e0feaefdff2fc7d8c2bbb242f8",
+            "req": 12,
+            "v": 65
+          },
+          {
+            "version": "2.2",
+            "commit": "a03aee6b4f2f7d70e74957810568201053367be4",
+            "req": 12,
+            "v": 66
+          },
+          {
+            "version": "2.1",
+            "commit": "42d29fedf73ff1c0203ef29643f496a3d8e59725",
+            "req": 12,
+            "v": 67
+          },
+          {
+            "version": "2.0",
+            "commit": "e37e37cbf84f461c9e43343c6e1330ed7e36938b",
+            "req": 12,
+            "v": 68
+          },
+          {
+            "version": "1.2.0",
+            "commit": "5b947c37581c5b5b5ad483e46b7f897eaff353d0",
+            "req": 10,
+            "v": 69
+          },
+          {
+            "version": "1.1.0",
+            "commit": "7e6ce5680bfcbe723a324c13ff7a61fb40d13267",
+            "req": 10,
+            "v": 70
+          },
+          {
+            "version": "1.0.0",
+            "commit": "841d6d9114e475bb574e50bffb1c957f3bf5dfc7",
+            "req": 10,
+            "v": 71
+          },
+          {
+            "version": "1.0.0",
+            "commit": "7aa756a91398ea61735ce38601995848cc17a959",
+            "req": 11,
+            "v": 72
+          },
+          {
+            "version": "1.0.0",
+            "commit": "2f775a5172edd43505a2968c25a6890631b224c9",
+            "req": 10,
+            "v": 73
+          },
+          {
+            "version": "1.0.0",
+            "commit": "496e1d693b4b73b9bf804888923e12ed0decf04e",
+            "req": 10,
+            "v": 74
+          },
+          {
+            "version": "1.0.0",
+            "commit": "896602d66771acc1e6bf001970d5ce0f9106c560",
+            "req": 10,
+            "v": 75
+          },
+          {
+            "version": "1.0.0",
+            "commit": "090ae7430f39fa0f5187b4877293e673b6ef2824",
+            "req": 10,
+            "v": 76
+          },
+          {
+            "version": "1.0.0",
+            "commit": "ad0f7e64502c2af527e2da86a4afdd462cc4a5b9",
+            "req": 10,
+            "v": 77
+          },
+          {
+            "version": "1.0.0",
+            "commit": "9fc3dccd954d935d22ed8317b02cb7c0f45ed9de",
+            "req": 10,
+            "v": 78
+          }
+        ],
+        "active": true,
+        "isRoot": false,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": 11,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\winim"
+      },
+      {
+        "pkg": {
+          "projectName": "npeg",
+          "u": "https://github.com/zevv/npeg"
+        },
+        "versions": [
+          {
+            "version": "1.3.0",
+            "commit": "409f6796d0e880b3f0222c964d1da7de6e450811",
+            "req": 15,
+            "v": 79
+          },
+          {
+            "version": "1.2.2",
+            "commit": "ec0cc6e64ea4c62d2aa382b176a4838474238f8d",
+            "req": 15,
+            "v": 80
+          },
+          {
+            "version": "1.2.1",
+            "commit": "26d62fdc40feb84c6533956dc11d5ee9ea9b6c09",
+            "req": 15,
+            "v": 81
+          },
+          {
+            "version": "1.2.0",
+            "commit": "ed7c60e15e0e9f088a77ffa76fa83e9723086173",
+            "req": 15,
+            "v": 82
+          },
+          {
+            "version": "1.2.0",
+            "commit": "2ddee95a1c0070e61d0a8ffac14607a1e1380ba4",
+            "req": 15,
+            "v": 83
+          },
+          {
+            "version": "1.1.2",
+            "commit": "ae1fa58af94477c40456414aa2a975cf26d5c9bc",
+            "req": 15,
+            "v": 84
+          },
+          {
+            "version": "1.1.1",
+            "commit": "f680e40f6cc7e026f53e4e9e68f496d6a7f5840a",
+            "req": 15,
+            "v": 85
+          },
+          {
+            "version": "1.1.0",
+            "commit": "0bd4219a2c88e891f6a3837acb208a5b1346b60e",
+            "req": 15,
+            "v": 86
+          },
+          {
+            "version": "1.1.0",
+            "commit": "1d5621248e4e4424c87945e7eecdc65ec6124259",
+            "req": 15,
+            "v": 87
+          },
+          {
+            "version": "1.0.1",
+            "commit": "1d54c2ffa57600ab0d797179790e1113e91c28a3",
+            "req": 15,
+            "v": 88
+          },
+          {
+            "version": "1.0.0",
+            "commit": "ed0fb09c9033a0757a3d7911066a1fc5add10846",
+            "req": 15,
+            "v": 89
+          },
+          {
+            "version": "0.27.0",
+            "commit": "4d0fc9b2c01c2d9e3582a916a09a139a3bc43e6e",
+            "req": 15,
+            "v": 90
+          },
+          {
+            "version": "0.26.0",
+            "commit": "afbd4e09055a9c01ea4b860a7a622748bc382e8f",
+            "req": 15,
+            "v": 91
+          },
+          {
+            "version": "0.25.0",
+            "commit": "a392e8c9bfd95fd1ea9bb1ec74e9a5a2a62c6965",
+            "req": 15,
+            "v": 92
+          },
+          {
+            "version": "0.24.1",
+            "commit": "e7bd87dc992512fd5825a557a56907647e03c979",
+            "req": 15,
+            "v": 93
+          },
+          {
+            "version": "0.24.0",
+            "commit": "078475ccceeaca0fac947492acdd24514da8d863",
+            "req": 15,
+            "v": 94
+          },
+          {
+            "version": "0.23.2",
+            "commit": "a037c646a47623b92718efadc2bb74d03664b360",
+            "req": 15,
+            "v": 95
+          },
+          {
+            "version": "0.23.1",
+            "commit": "bd969ad3745db0d66022564cac76cf9424651104",
+            "req": 15,
+            "v": 96
+          },
+          {
+            "version": "0.23.0",
+            "commit": "a812064587d983c129737f8500bf74990e6b8dab",
+            "req": 15,
+            "v": 97
+          },
+          {
+            "version": "0.22.2",
+            "commit": "814ea235dd398108d7b18f966694c3d951575701",
+            "req": 15,
+            "v": 98
+          },
+          {
+            "version": "0.22.1",
+            "commit": "2e75367095f54d4351005078bad98041a55b14c1",
+            "req": 15,
+            "v": 99
+          },
+          {
+            "version": "0.22.1",
+            "commit": "e63b521c6410b277f3df206f591392931f685760",
+            "req": 15,
+            "v": 100
+          },
+          {
+            "version": "0.22.0",
+            "commit": "0eabb7c462d30932049f0b7e6a030c1562cf9fee",
+            "req": 15,
+            "v": 101
+          },
+          {
+            "version": "0.22.0",
+            "commit": "9a2ae34c3ea49ec45d6348692da49128f1ad245e",
+            "req": 15,
+            "v": 102
+          },
+          {
+            "version": "0.21.3",
+            "commit": "bfcb4bcae76a917c3c88736ca773e4cb67dbb2d8",
+            "req": 15,
+            "v": 103
+          },
+          {
+            "version": "0.21.3",
+            "commit": "af29497f86e52c8a96f6b8fbaad2623ef8c5213f",
+            "req": 15,
+            "v": 104
+          },
+          {
+            "version": "0.21.2",
+            "commit": "bae84c47a1bb259b209b6f6be1582327b784539d",
+            "req": 15,
+            "v": 105
+          },
+          {
+            "version": "0.21.1",
+            "commit": "c0e873a17bc713c80e74fec3c30cb62dcd5d194a",
+            "req": 15,
+            "v": 106
+          },
+          {
+            "version": "0.21.0",
+            "commit": "8c3471a548129f3bf62df15cd0fd8cca1787d852",
+            "req": 15,
+            "v": 107
+          },
+          {
+            "version": "0.20.0",
+            "commit": "eeae7746c9b1118bcf27744ab2aee26969051256",
+            "req": 15,
+            "v": 108
+          },
+          {
+            "version": "0.19.0",
+            "commit": "dd34f903a9a63b876cb2db19b7a4ce0bcc252134",
+            "req": 15,
+            "v": 109
+          },
+          {
+            "version": "0.18.0",
+            "commit": "1a9d36aa3b34a6169d4530463f1c17a3fe1e075e",
+            "req": 15,
+            "v": 110
+          },
+          {
+            "version": "0.18.0",
+            "commit": "72d5be7290c63f44d9ca3b9ce6ba92699422d1f5",
+            "req": 15,
+            "v": 111
+          },
+          {
+            "version": "0.18.0",
+            "commit": "38e37ac5bf1be77c0ca5632d44d6ea1f6aff634d",
+            "req": 15,
+            "v": 112
+          },
+          {
+            "version": "0.17.1",
+            "commit": "30b446b39442cdbc53a97018ab8a54149aa7c3b7",
+            "req": 15,
+            "v": 113
+          },
+          {
+            "version": "0.17.1",
+            "commit": "dde412e5b7bccf3dc244bddcaabe20b54b46f5a1",
+            "req": 15,
+            "v": 114
+          },
+          {
+            "version": "0.17.1",
+            "commit": "4f86a089eeb227b51801fa22c0220ee92bba8966",
+            "req": 15,
+            "v": 115
+          },
+          {
+            "version": "0.17.0",
+            "commit": "f4ddffb5848c42c6151743dd9c7eddcaaabc56cc",
+            "req": 15,
+            "v": 116
+          },
+          {
+            "version": "0.16.0",
+            "commit": "6aad2e438c52ff0636c7bfb64338e444ac3e83ba",
+            "req": 15,
+            "v": 117
+          },
+          {
+            "version": "0.15.0",
+            "commit": "a933fb9832566fc95273e417597bfb4faf564ca6",
+            "req": 15,
+            "v": 118
+          },
+          {
+            "version": "0.14.1",
+            "commit": "be9f03f92304cbeab70572944a8563db9b23b2fb",
+            "req": 15,
+            "v": 119
+          },
+          {
+            "version": "0.14.0",
+            "commit": "39964f0d220bfaade47a568bf03c1cf28aa2bc37",
+            "req": 15,
+            "v": 120
+          },
+          {
+            "version": "0.13.0",
+            "commit": "87d2f2c4f6ef7da350d45beb5a336611bde7f518",
+            "req": 15,
+            "v": 121
+          },
+          {
+            "version": "0.12.0",
+            "commit": "82c8d92837108dce225358ace2c416bf9a3f30ce",
+            "req": 15,
+            "v": 122
+          },
+          {
+            "version": "0.11.0",
+            "commit": "802f47c0f7f4318a4f0858ba5a6a6ed2333bde71",
+            "req": 15,
+            "v": 123
+          },
+          {
+            "version": "0.10.0",
+            "commit": "4c959a72db5283b55eeef491076eefb5e02316f1",
+            "req": 15,
+            "v": 124
+          },
+          {
+            "version": "0.9.0",
+            "commit": "bb25a195133f9f7af06386d0809793923cc5e8ab",
+            "req": 15,
+            "v": 125
+          },
+          {
+            "version": "0.8.0",
+            "commit": "f446b6056eef6d8dc9d8b47a79aca93d17dc8230",
+            "req": 15,
+            "v": 126
+          },
+          {
+            "version": "0.7.0",
+            "commit": "06c38bd8563d822455bc237c2a98c153d938ed1b",
+            "req": 15,
+            "v": 127
+          },
+          {
+            "version": "0.6.0",
+            "commit": "458c7b5910fcb157af3fc51bc3b3e663fdb3ed4a",
+            "req": 15,
+            "v": 128
+          },
+          {
+            "version": "0.6.0",
+            "commit": "03c6580b25a367aef0b176eb902c4c2275edfddb",
+            "req": 15,
+            "v": 129
+          },
+          {
+            "version": "0.6.0",
+            "commit": "f7a8fee30a89c894b4701bd61c9b72cb7a6c9144",
+            "req": 15,
+            "v": 130
+          },
+          {
+            "version": "0.5.0",
+            "commit": "39afdb5733d3245386d29d08c5ff61c89268f499",
+            "req": 15,
+            "v": 131
+          },
+          {
+            "version": "0.4.0",
+            "commit": "1ea9868a3fee3aa487ab7ec9129208a4dd483d0d",
+            "req": 15,
+            "v": 132
+          },
+          {
+            "version": "0.3.0",
+            "commit": "45ea601e1c7f64fb857bc99df984b86673621d2c",
+            "req": 15,
+            "v": 133
+          },
+          {
+            "version": "0.2.0",
+            "commit": "d93d49c81fc8722d7929ac463b435c0f2e10c53b",
+            "req": 15,
+            "v": 134
+          },
+          {
+            "version": "0.1.0",
+            "commit": "8df2f0c9391995fd086b8aab00e8ab7aded1e8f0",
+            "req": 15,
+            "v": 135
+          },
+          {
+            "version": "0.1.0",
+            "commit": "71e10906d1dca90a9ca2c6fd6d2a6b0688aec866",
+            "req": 16,
+            "v": 136
+          },
+          {
+            "version": "0.1.0",
+            "commit": "3a8a05c52b3530ae7a1820cae76f762672314f65",
+            "req": 15,
+            "v": 137
+          }
+        ],
+        "active": true,
+        "isRoot": false,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": 14,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\npeg"
+      },
+      {
+        "pkg": {
+          "projectName": "memlib",
+          "u": "https://github.com/khchen/memlib"
+        },
+        "versions": [
+          {
+            "version": "#head",
+            "commit": "",
+            "req": 17,
+            "v": 138
+          },
+          {
+            "version": "1.3.0",
+            "commit": "0c46ef5e803160a9eab867d5ba0fcdb307aaa492",
+            "req": 17,
+            "v": 139
+          },
+          {
+            "version": "1.2.0",
+            "commit": "42986fbf2db066710145af31347f9ff88576f57b",
+            "req": 17,
+            "v": 140
+          },
+          {
+            "version": "1.1.0",
+            "commit": "c73ac61900ec9e2a2863a88b9213bc7f57e7149f",
+            "req": 17,
+            "v": 141
+          },
+          {
+            "version": "1.0.0",
+            "commit": "dac2950873ed46b6795c62585ec70548edb46f35",
+            "req": 17,
+            "v": 142
+          }
+        ],
+        "active": true,
+        "isRoot": false,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": 3,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\memlib"
+      },
+      {
+        "pkg": {
+          "projectName": "miniz",
+          "u": "https://github.com/treeform/miniz"
+        },
+        "versions": [
+          {
+            "version": "0.2.0",
+            "commit": "e99dc20c36a86576d983dfa14cf1db2439193861",
+            "req": 18,
+            "v": 143
+          },
+          {
+            "version": "0.1.0",
+            "commit": "c424ca808e2eb91382921b4a070862cd9e16d822",
+            "req": 19,
+            "v": 144
+          }
+        ],
+        "active": false,
+        "isRoot": false,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": -1,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\miniz"
+      },
+      {
+        "pkg": {
+          "projectName": "packedjson",
+          "u": "https://github.com/Araq/packedjson"
+        },
+        "versions": [
+          {
+            "version": "0.2.2",
+            "commit": "69686f0345fb01f3c5150b9897ebdbcfa85f5df4",
+            "req": 20,
+            "v": 145
+          },
+          {
+            "version": "0.2.2",
+            "commit": "d11d167905f65935e31772c1edec88ca8fe055e2",
+            "req": 20,
+            "v": 146
+          },
+          {
+            "version": "0.2.1",
+            "commit": "cb01aabcd5e5010b28adda34a0c869181e387b02",
+            "req": 20,
+            "v": 147
+          },
+          {
+            "version": "0.2.1",
+            "commit": "7198cc8d3385d5392b8fb6bb90a9feb24b2dddbf",
+            "req": 20,
+            "v": 148
+          },
+          {
+            "version": "0.2.0",
+            "commit": "f8789913f21a139f783b2754b19b6842bf3af228",
+            "req": 20,
+            "v": 149
+          },
+          {
+            "version": "0.1.0",
+            "commit": "f74b7700eba84531694c72c69b56b1a1210d068d",
+            "req": 19,
+            "v": 150
+          },
+          {
+            "version": "0.1.0",
+            "commit": "df007babe73dccb0f8714401f459c530ea041f8b",
+            "req": 20,
+            "v": 151
+          }
+        ],
+        "active": false,
+        "isRoot": false,
+        "isTopLevel": false,
+        "status": 0,
+        "activeVersion": -1,
+        "ondisk": "D:\\home\\vert2air\\workspace\\portfile_nim\\packedjson"
+      }
+    ],
+    "reqs": [
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "",
+        "nimVersion": "",
+        "v": -1,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "",
+        "nimVersion": "",
+        "v": -1,
+        "status": 2,
+        "err": ""
+      },
+      {
+        "deps": [
+          [
+            {
+              "projectName": "wNim",
+              "u": "https://github.com/khchen/wNim"
+            },
+            {
+              "a": {
+                "r": 5,
+                "v": "#head"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ],
+          [
+            {
+              "projectName": "nim_qr",
+              "u": "https://github.com/ThomasTJdev/nim_qr"
+            },
+            {
+              "a": {
+                "r": 5,
+                "v": "#head"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ],
+          [
+            {
+              "projectName": "checksums",
+              "u": "https://github.com/nim-lang/checksums"
+            },
+            {
+              "a": {
+                "r": 5,
+                "v": "#head"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ]
+        ],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "",
+        "nimVersion": "",
+        "v": 152,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [
+          [
+            {
+              "projectName": "winim",
+              "u": "https://github.com/khchen/winim"
+            },
+            {
+              "a": {
+                "r": 0,
+                "v": "3.6.0"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ],
+          [
+            {
+              "projectName": "npeg",
+              "u": "https://github.com/zevv/npeg"
+            },
+            {
+              "a": {
+                "r": 0,
+                "v": "0.24.1"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ],
+          [
+            {
+              "projectName": "memlib",
+              "u": "https://github.com/khchen/memlib"
+            },
+            {
+              "a": {
+                "r": 0,
+                "v": "1.1.0"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ]
+        ],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "1.0.0",
+        "nimVersion": "1.4.0",
+        "v": 153,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "1.4.0",
+        "nimVersion": "1.4.0",
+        "v": 155,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": true,
+        "srcDir": "src",
+        "version": "1.3.1",
+        "nimVersion": "1.4.0",
+        "v": 154,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": true,
+        "srcDir": "src",
+        "version": "1.2.0",
+        "nimVersion": "1.0.6",
+        "v": 156,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "0.2.1",
+        "nimVersion": "2.0.0",
+        "v": 157,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "0.1.0",
+        "nimVersion": "1.6.12",
+        "v": 158,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "3.9.4",
+        "nimVersion": "1.0.0",
+        "v": 159,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "1.0.0",
+        "nimVersion": "0.15.0",
+        "v": 163,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "1.0.0",
+        "nimVersion": "",
+        "v": 164,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "2.0",
+        "nimVersion": "0.18.0",
+        "v": 162,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [
+          [
+            {
+              "projectName": "miniz",
+              "u": "https://github.com/treeform/miniz"
+            },
+            {
+              "a": {
+                "r": 0,
+                "v": "0.1.0"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ]
+        ],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "3.0",
+        "nimVersion": "0.19.0",
+        "v": 161,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "3.2.1",
+        "nimVersion": "0.19.0",
+        "v": 160,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "1.3.0",
+        "nimVersion": "0.19.0",
+        "v": 165,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [
+          [
+            {
+              "projectName": "packedjson",
+              "u": "https://github.com/Araq/packedjson"
+            },
+            {
+              "a": {
+                "r": 5,
+                "v": "#head"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ]
+        ],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "0.1.0",
+        "nimVersion": "0.19.0",
+        "v": 166,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [
+          [
+            {
+              "projectName": "winim",
+              "u": "https://github.com/khchen/winim"
+            },
+            {
+              "a": {
+                "r": 0,
+                "v": "3.6.0"
+              },
+              "b": {
+                "r": 0,
+                "v": ""
+              },
+              "isInterval": false
+            }
+          ]
+        ],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "1.0.0",
+        "nimVersion": "1.2.0",
+        "v": 167,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "0.2.0",
+        "nimVersion": "1.0",
+        "v": 168,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "src",
+        "version": "0.1.0",
+        "nimVersion": "0.18.1",
+        "v": 169,
+        "status": 0,
+        "err": ""
+      },
+      {
+        "deps": [],
+        "hasInstallHooks": false,
+        "srcDir": "",
+        "version": "0.2.2",
+        "nimVersion": "0.18.1",
+        "v": 170,
+        "status": 0,
+        "err": ""
+      }
+    ]
+  }
 }

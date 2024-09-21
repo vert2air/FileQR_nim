@@ -1,0 +1,27 @@
+[submodule "_deps/wNim"]
+	path = _deps/wNim
+	url = https://github.com/khchen/wNim
+[submodule "_deps/nim_qr"]
+	path = _deps/nim_qr
+	url = https://github.com/ThomasTJdev/nim_qr
+[submodule "_deps/checksums"]
+	path = _deps/checksums
+	url = https://github.com/nim-lang/checksums
+[submodule "_deps/winim"]
+	path = _deps/winim
+	url = https://github.com/khchen/winim
+[submodule "_deps/npeg"]
+	path = _deps/npeg
+	url = https://github.com/zevv/npeg
+[submodule "_deps/memlib"]
+	path = _deps/memlib
+	url = https://github.com/khchen/memlib
+[submodule "_deps/miniz"]
+	path = _deps/miniz
+	url = https://github.com/treeform/miniz
+[submodule "_deps/packedjson"]
+	path = _deps/packedjson
+	url = https://github.com/Araq/packedjson
+[submodule "_deps/packages"]
+	path = _deps/packages
+	url = https://github.com/nim-lang/packages
