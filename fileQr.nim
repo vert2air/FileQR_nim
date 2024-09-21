@@ -192,7 +192,7 @@ btn_input.wEvent_Button do ():
 
 var frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
 var panel_qr_ctl = Panel(frame_qr_ctl)
-var frame_qr = Frame(title="QR code", size=(800, 800))
+var frame_qr = Frame(title="QR code", size=(600, 630))
 var panel_qr = Panel(frame_qr)
 var btn_head = Button(panel_qr_ctl, label="▲▲")
 var btn_next = Button(panel_qr_ctl, label="▼")
