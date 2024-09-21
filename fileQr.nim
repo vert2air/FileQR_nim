@@ -241,15 +241,19 @@ proc popupQR(data_file_name: Path) =
   displayQr(0)
 
 btn_head.wEvent_Button do ():
+  if idx == low(qr_codes):
+    return
   idx = low(qr_codes)
   displayQr(idx)
 
 btn_next.wEvent_Button do ():
   if idx < high(qr_codes):
     idx += 1
-  displayQr(idx)
+    displayQr(idx)
 
 btn_tail.wEvent_Button do ():
+  if idx == high(qr_codes):
+    return
   idx = high(qr_codes)
   displayQr(idx)
 
