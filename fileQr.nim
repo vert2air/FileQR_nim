@@ -78,7 +78,6 @@ proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1) =
       f.close()
     f.write('B') # bfType
     f.write('M') # bfType
-    # let data_size: int = ((3 * line_count + 3) div 4) * 4 * line_count
     let data_size: int = ((3 * line_count * magnify + 3) div 4) * 4 * line_count * magnify
     f.write(num2bin4(14 + 40 + data_size)) # bfSize
     f.write(num2bin2(0)) # bfReserved1
@@ -183,25 +182,11 @@ var btn_head = Button(panel_qr_ctl, label="▲▲")
 var btn_next = Button(panel_qr_ctl, label="▼")
 var btn_tail = Button(panel_qr_ctl, label="▼▼")
 var idx: int = 0
-#var bm: wStaticBitmap = nil
-#var bm: wBitmap = nil
 var bm: wImage = nil
 const qr_file_name = "test.bmp"
 var qr_codes: seq[seq[string]]
 var memDc = MemoryDC()
 
-#[
-proc layout_qr() =
-  echo "layout_qr HERE 1"
-  if memDc != nil:
-    echo "layout_qr HERE 2"
-    panel_qr.autolayout """
-      H:|-[btn_head,btn_next,btn_tail]-[memDc]-|
-      V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
-      V:|-[memDc(=memDc.width)]-|
-    """
-  echo "layout_qr HERE 3"
-]#
 proc layout_qr_ctl() =
   panel_qr_ctl.autolayout """
     H:|-[btn_head,btn_next,btn_tail]-|
@@ -210,10 +195,7 @@ proc layout_qr_ctl() =
 
 proc displayQr(idx: int) =
     qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3)
-    #bm = StaticBitmap(panel_qr, bitmap=Bitmap(fmt"{qr_file_name}{idx}"), style=wSbFit)
-    # bm = Bitmap(fmt"{qr_file_name}{idx}")
     bm = Image(fmt"{qr_file_name}{idx}")
-    # bm = bm.scale((width: bm.size.width * 2, height: bm.size.height * 2))
     # bm.backgroundColor = -1
     memDc.selectObject(Bitmap((width: bm.size.width + 50, height: bm.size.height + 50)))
     memDc.clear()
