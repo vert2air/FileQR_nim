@@ -68,25 +68,26 @@ proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
         f.write(fmt"{line_len} {line_len}" & "\n")
         f.write(qrbin)
 
-proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1) =
+proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margin: int = 20) =
   # BMPファイルフォーマット
   # https://www.setsuki.com/hsp/ext/bmp.htm
-  var line_count = qrLine.len()
+  let line_count = qrLine.len()
+  let bmp_size: int = line_count * magnify + 2 * margin
   block:
     var f: File = open(bmp_fn, FileMode.fmWrite)
     defer:
       f.close()
     f.write('B') # bfType
     f.write('M') # bfType
-    let data_size: int = ((3 * line_count * magnify + 3) div 4) * 4 * line_count * magnify
+    let data_size: int = ((3 * bmp_size + 3) div 4) * 4 * bmp_size
     f.write(num2bin4(14 + 40 + data_size)) # bfSize
     f.write(num2bin2(0)) # bfReserved1
     f.write(num2bin2(0)) # bfReserved2
     f.write(num2bin4(14 + 40)) # bfOffBits
 
     f.write(num2bin4(40)) # bcSize
-    f.write(num2bin4(line_count * magnify)) # bcWidth
-    f.write(num2bin4(line_count * magnify)) # bcHeight
+    f.write(num2bin4(bmp_size)) # bcWidth
+    f.write(num2bin4(bmp_size)) # bcHeight
     f.write(num2bin2(1)) # bcPlanes
     f.write(num2bin2(24)) # bcBitCount
 
@@ -97,8 +98,16 @@ proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1) =
     f.write(num2bin4(0)) # biClrUsed
     f.write(num2bin4(0)) # biClrImportant
 
+    for m in 1 .. margin:
+      for ix in 1 .. bmp_size:
+        f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
+      for ix in (3 * bmp_size mod 4) ..< 4:
+        f.write(fmt"{char(0x00)}")
+
     for line in qrLine:
       for mag in 1 .. magnify:
+        for ix in 1 .. margin:
+          f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
         for ch in line:
           case ch:
           of '0':
@@ -109,8 +118,16 @@ proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1) =
               f.write(fmt"{char(0x00)}{char(0x00)}{char(0x00)}")
           else:
             echo "skip 1 char"
-        for ix in (3 * line_count * magnify mod 4) ..< 4:
+        for ix in 1 .. margin:
+          f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
+        for ix in (3 * bmp_size mod 4) ..< 4:
           f.write(fmt"{char(0x00)}")
+
+    for m in 1 .. margin:
+      for ix in 1 .. bmp_size:
+        f.write(fmt"{char(0xff)}{char(0xff)}{char(0xff)}")
+      for ix in (3 * bmp_size mod 4) ..< 4:
+        f.write(fmt"{char(0x00)}")
 
 frame.dpiAutoScale:
     frame.size = (750, 450)
@@ -121,7 +138,6 @@ let box_input  = StaticBox(panel, label="Select Input")
 let box_QR     = StaticBox(panel, label="Display QR code")
 let box_decode = StaticBox(panel, label="Decode file")
 let box_output = StaticBox(panel, label="Output")
-box_output.margin = 20
 
 let rb_file = RadioButton(panel, label="File Name")
 let rb_text = RadioButton(panel, label="Direct Text")
@@ -194,14 +210,14 @@ proc layout_qr_ctl() =
   """
 
 proc displayQr(idx: int) =
-    qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3)
+    qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3, margin=20)
     bm = Image(fmt"{qr_file_name}{idx}")
     # bm.backgroundColor = -1
-    memDc.selectObject(Bitmap((width: bm.size.width + 50, height: bm.size.height + 50)))
+    memDc.selectObject(Bitmap(bm.size))
     memDc.clear()
     memDc.setBackground(wWhiteBrush)
     memDc.setBrush(wWhiteBrush)
-    memDc.drawImage(bm, 10, 10)
+    memDc.drawImage(bm, 0, 0)
     panel_qr.center()
     frame_qr.show()
     panel_qr.refresh()
@@ -210,7 +226,7 @@ proc displayQr(idx: int) =
 
 panel_qr.wEvent_Paint do ():
   var dc = PaintDC(panel_qr)
-  dc.blit(source=memDc, xdest=0, ydest=0, width=bm.getSize().width + 50, height=bm.getSize().height + 50)
+  dc.blit(source=memDc, xdest=0, ydest=0, width=bm.getSize().width, height=bm.getSize().height)
   dc.delete
 
 proc popupQR(data_file_name: Path) =
