@@ -2,7 +2,7 @@ import wNim/wNim/[wApp, wBitmap, wBrush, wButton, wComboBox, wFileDialog,
   wFrame, wImage, wMemoryDC, wPaintDC, wPanel, wRadioButton, wStaticBox,
   wStaticText, wStatusBar, wTextCtrl, ]
 import qr
-import std/[base64, paths, strformat, strutils, tables]
+import std/[base64, paths, re, strformat, strutils, tables]
 import checksums/sha1
 
 let list_err = {
@@ -28,19 +28,18 @@ proc num2bin4(number: int): string =
     fmt"{char((number shr 24) and 0xff)}",
   ].join()
 
-proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string]] =
+proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[string]] =
   result = @[]
-  let base64data: string = data.encode()
-  let baseName: string = fileName.lastPathPart().string()
-  let size_per_qr: int = list_err[err_cor][1] - fmt"abcd:001:100:{baseName}:".len()
-  let qrHash: string = ($secureHash(base64data & err_cor))[0..3]
+  let base64data: string = filename & ":" & data.encode()
+  let size_per_qr: int = list_err[err_cor][1] - fmt"12345678:001:100:".len()
+  let qrHash: string = ($secureHash(base64data & err_cor))[0..7]
   let last_len: int = base64data.len() mod size_per_qr
   let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
 
   for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
     var qrOrder: seq[string] = @[]
     for qrRevLine in qrBinary(
-            fmt"{qrHash}:{result.len:03d}:{total:03d}:{baseName}:" & base64data[offset ..< offset + size_per_qr],
+            fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[offset ..< offset + size_per_qr],
             eccLevel=list_err[err_cor][0]).splitLines:
       if qrRevLine.len() > 0:
         qrOrder.insert(qrRevLine, 0)
@@ -48,11 +47,69 @@ proc make_qr_data(fileName: Path, data: string, err_cor: string): seq[seq[string
   if last_len > 0:
     var qrOrder: seq[string] = @[]
     for qrRevLine in qrBinary(
-              fmt"{qrHash}:{result.len:03d}:{total:03d}:{baseName}:" & base64data[result.len * size_per_qr .. ^1],
+              fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[result.len * size_per_qr .. ^1],
               eccLevel=list_err[err_cor][0]).splitLines:
       if qrRevLine.len() > 0:
         qrOrder.insert(qrRevLine, 0)
     result.add(qrOrder)
+
+proc decode_qr_data(data: string) =
+  var acc = initTable[string, seq[string]]()
+  for line in data.splitLines:
+    var matches: array[4, string]
+    if match(line, re".*([0-9a-fA-f]{8}):(000):(\d{3}):(.*:[0-9A-Za-z+/]*=*).*", matches):
+      # pass
+      discard matches
+    elif match(line, re".*([0-9a-fA-f]{8}):(\d{3}):(\d{3}):([0-9A-Za-z+/]*=*).*", matches):
+      # pass
+      discard matches
+    else:
+      # フォーマットが違った。
+      echo fmt"discard line : illegal format : '{line}'"
+      continue
+    let hash = matches[0]
+    let myIndex = matches[1].parseInt
+    let totalIndex = matches[2].parseInt
+    let nameAndBase64 = matches[3]
+    if myIndex >= totalIndex:
+      # この行のindexが総長を超えた。
+      echo "discard line : too big myIndex"
+      continue
+    if hash in acc:
+        # 既出のエントリだった。
+        if totalIndex != acc[hash].len:
+          # 総長が既出の値と違った。
+          echo "discard line : existed totalIndex different"
+          continue
+        if acc[hash][myIndex] != "":
+          # 処理済みのindexだった。
+          echo "discard line : duplicate index"
+          continue
+    else:
+      # 新出のエントリだった。
+      acc[hash] = newSeq[string](totalIndex)
+      echo fmt"add new hash : {hash}"
+    acc[hash][myIndex] = nameAndBase64
+  for hash in acc.keys:
+    var lack = false
+    for line in acc[hash]:
+      if line == "":
+        echo "not complete"
+        lack = true
+        break
+    if lack:
+      continue
+    echo fmt"output for hash : {hash}"
+    var matches: array[2, string]
+    if match(acc[hash].join, re"^(.*):(.*)$", matches):
+      let filename = matches[0]
+      let base64data = matches[1]
+      echo fmt"file name : {filename}"
+      block:
+        let outFile = open(filename, FileMode.fmWrite)
+        defer:
+          outFile.close
+        outFile.write(base64data.decode)
 
 proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
   let line_len = qrbin.find("\n")
@@ -235,7 +292,7 @@ proc popupQR(data_file_name: Path) =
     for k, v in list_err:
       if cb_err.value().startsWith(k):
         err_level = k
-    qr_codes = make_qr_data(data_file_name, data, err_level)
+    qr_codes = make_qr_data(data_file_name.lastPathPart.string, data, err_level)
   displayQr(0)
 
 btn_head.wEvent_Button do ():
@@ -277,6 +334,15 @@ btn_qr.wEvent_Button do ():
     in_data = input_text.value
   if in_data.len() > 0:
     popupQR(input_file.value.Path())
+
+btn_decode.wEvent_Button do ():
+  if rb_file.value == true and input_file.value.len() > 0:
+    block:
+      let inFile = open(input_file.value, FileMode.fmRead)
+      defer:
+        inFile.close
+      let data = inFile.readAll
+      decode_qr_data(data)
 
 layout()
 frame.center()
