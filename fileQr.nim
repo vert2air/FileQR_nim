@@ -24,89 +24,6 @@ proc num2bin4(number: int): string =
     fmt"{char((number shr 24) and 0xff)}",
   ].join()
 
-proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[string]] =
-  result = @[]
-  let base64data: string = filename & ":" & data.encode()
-  let size_per_qr: int = list_err[err_cor][1] - fmt"12345678:001:100:".len()
-  let qrHash: string = ($secureHash(base64data & err_cor))[0..7]
-  let last_len: int = base64data.len() mod size_per_qr
-  let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
-
-  for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
-    var qrOrder: seq[string] = @[]
-    for qrRevLine in qrBinary(
-            fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[offset ..< offset + size_per_qr],
-            eccLevel=list_err[err_cor][0]).splitLines:
-      if qrRevLine.len() > 0:
-        qrOrder.insert(qrRevLine, 0)
-    result.add(qrOrder)
-  if last_len > 0:
-    var qrOrder: seq[string] = @[]
-    for qrRevLine in qrBinary(
-              fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[result.len * size_per_qr .. ^1],
-              eccLevel=list_err[err_cor][0]).splitLines:
-      if qrRevLine.len() > 0:
-        qrOrder.insert(qrRevLine, 0)
-    result.add(qrOrder)
-
-proc decode_qr_data(data: string) =
-  var acc = initTable[string, seq[string]]()
-  for line in data.splitLines:
-    var matches: array[4, string]
-    if match(line, re".*([0-9a-fA-f]{8}):(000):(\d{3}):(.*:[0-9A-Za-z+/]*=*).*", matches):
-      # pass
-      discard matches
-    elif match(line, re".*([0-9a-fA-f]{8}):(\d{3}):(\d{3}):([0-9A-Za-z+/]*=*).*", matches):
-      # pass
-      discard matches
-    else:
-      # フォーマットが違った。
-      echo fmt"discard line : illegal format : '{line}'"
-      continue
-    let hash = matches[0]
-    let myIndex = matches[1].parseInt
-    let totalIndex = matches[2].parseInt
-    let nameAndBase64 = matches[3]
-    if myIndex >= totalIndex:
-      # この行のindexが総長を超えた。
-      echo "discard line : too big myIndex"
-      continue
-    if hash in acc:
-        # 既出のエントリだった。
-        if totalIndex != acc[hash].len:
-          # 総長が既出の値と違った。
-          echo "discard line : existed totalIndex different"
-          continue
-        if acc[hash][myIndex] != "":
-          # 処理済みのindexだった。
-          echo "discard line : duplicate index"
-          continue
-    else:
-      # 新出のエントリだった。
-      acc[hash] = newSeq[string](totalIndex)
-      echo fmt"add new hash : {hash}"
-    acc[hash][myIndex] = nameAndBase64
-  for hash in acc.keys:
-    var lack = false
-    for line in acc[hash]:
-      if line == "":
-        echo "not complete"
-        lack = true
-        break
-    if lack:
-      continue
-    echo fmt"output for hash : {hash}"
-    var matches: array[2, string]
-    if match(acc[hash].join, re"^(.*):(.*)$", matches):
-      let filename = matches[0]
-      let base64data = matches[1]
-      echo fmt"file name : {filename}"
-      block:
-        let outFile = open(filename, FileMode.fmWrite)
-        defer:
-          outFile.close
-        outFile.write(base64data.decode)
-
 proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margin: int = 20) =
   # BMPファイルフォーマット
   # https://www.setsuki.com/hsp/ext/bmp.htm
@@ -176,6 +93,7 @@ frame.dpiAutoScale:
     frame.size = (750, 450)
 
 let statusBar = StatusBar(frame)
+statusBar.setFieldsCount(1)
 
 let box_input  = StaticBox(panel, label="Select Input")
 let box_QR     = StaticBox(panel, label="Display QR code")
@@ -254,6 +172,95 @@ proc layout_qr_ctl() =
     V:|-[btn_head]-[btn_next(btn_head.height*2)]-[btn_tail(btn_head.height)]-|
     V:|-[label_cur_idx,label_total]-|
   """
+
+proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[string]] =
+  result = @[]
+  let base64data: string = filename & ":" & data.encode()
+  let size_per_qr: int = list_err[err_cor][1] - fmt"12345678:001:100:".len()
+  let qrHash: string = ($secureHash(base64data & err_cor))[0..7]
+  let last_len: int = base64data.len() mod size_per_qr
+  let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
+
+  for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
+    statusBar.setStatusText(fmt"Encoding QR code {result.len} / {total}")
+    var qrOrder: seq[string] = @[]
+    for qrRevLine in qrBinary(
+            fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[offset ..< offset + size_per_qr],
+            eccLevel=list_err[err_cor][0]).splitLines:
+      if qrRevLine.len() > 0:
+        qrOrder.insert(qrRevLine, 0)
+    result.add(qrOrder)
+  if last_len > 0:
+    statusBar.setStatusText(fmt"Encoding QR code {result.len} / {total}")
+    var qrOrder: seq[string] = @[]
+    for qrRevLine in qrBinary(
+              fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[result.len * size_per_qr .. ^1],
+              eccLevel=list_err[err_cor][0]).splitLines:
+      if qrRevLine.len() > 0:
+        qrOrder.insert(qrRevLine, 0)
+    result.add(qrOrder)
+  statusBar.setStatusText(fmt"Encoding QR code done.")
+
+proc decode_qr_data(data: string) =
+  var acc = initTable[string, seq[string]]()
+  statusBar.setStatusText("Scanning text in QR code...")
+  for line in data.splitLines:
+    var matches: array[4, string]
+    if match(line, re".*([0-9a-fA-f]{8}):(000):(\d{3}):(.*:[0-9A-Za-z+/]*=*).*", matches):
+      # pass
+      discard matches
+    elif match(line, re".*([0-9a-fA-f]{8}):(\d{3}):(\d{3}):([0-9A-Za-z+/]*=*).*", matches):
+      # pass
+      discard matches
+    else:
+      # フォーマットが違った。
+      echo fmt"discard line : illegal format : '{line}'"
+      continue
+    let hash = matches[0]
+    let myIndex = matches[1].parseInt
+    let totalIndex = matches[2].parseInt
+    let nameAndBase64 = matches[3]
+    if myIndex >= totalIndex:
+      # この行のindexが総長を超えた。
+      echo "discard line : too big myIndex"
+      continue
+    if hash in acc:
+        # 既出のエントリだった。
+        if totalIndex != acc[hash].len:
+          # 総長が既出の値と違った。
+          echo "discard line : existed totalIndex different"
+          continue
+        if acc[hash][myIndex] != "":
+          # 処理済みのindexだった。
+          echo "discard line : duplicate index"
+          continue
+    else:
+      # 新出のエントリだった。
+      acc[hash] = newSeq[string](totalIndex)
+      echo fmt"add new hash : {hash}"
+    acc[hash][myIndex] = nameAndBase64
+  statusBar.setStatusText("Decoding text in QR code...")
+  for hash in acc.keys:
+    var lack = false
+    for line in acc[hash]:
+      if line == "":
+        echo "not complete"
+        lack = true
+        break
+    if lack:
+      continue
+    echo fmt"output for hash : {hash}"
+    var matches: array[2, string]
+    if match(acc[hash].join, re"^(.*):(.*)$", matches):
+      let filename = matches[0]
+      let base64data = matches[1]
+      echo fmt"file name : {filename}"
+      block:
+        let outFile = open(filename, FileMode.fmWrite)
+        defer:
+          outFile.close
+        outFile.write(base64data.decode)
+  statusBar.setStatusText("Decoding text in QR code done")
 
 proc displayQr(idx: int) =
   label_cur_idx.setLabel(idx.intToStr)
