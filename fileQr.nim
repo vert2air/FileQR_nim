@@ -107,16 +107,6 @@ proc decode_qr_data(data: string) =
           outFile.close
         outFile.write(base64data.decode)
 
-proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
-  let line_len = qrbin.find("\n")
-  block:
-    let f: File = open(pbm_fn, FileMode.fmWrite)
-    defer:
-      f.close
-    f.write("P1\n")
-    f.write(fmt"{line_len} {line_len}" & "\n")
-    f.write(qrbin)
-
 proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margin: int = 20) =
   # BMPファイルフォーマット
   # https://www.setsuki.com/hsp/ext/bmp.htm
