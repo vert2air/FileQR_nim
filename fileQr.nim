@@ -309,19 +309,16 @@ proc popupQR(data_file_name: Path) =
   setCurIdx(0)
 
 btn_head.wEvent_Button do ():
-  if cur_idx == low(qr_codes):
-    return
-  setCurIdx(low(qr_codes))
+  if cur_idx != low(qr_codes):
+    setCurIdx(low(qr_codes))
 
 btn_next.wEvent_Button do ():
   if cur_idx < high(qr_codes):
-    cur_idx += 1
-    setCurIdx(cur_idx)
+    setCurIdx(cur_idx + 1)
 
 btn_tail.wEvent_Button do ():
-  if cur_idx == high(qr_codes):
-    return
-  setCurIdx(high(qr_codes))
+  if cur_idx != high(qr_codes):
+    setCurIdx(high(qr_codes))
 
 rb_file.value = true
 btn_qr.disable
