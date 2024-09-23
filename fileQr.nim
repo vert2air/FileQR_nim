@@ -112,7 +112,7 @@ proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
   block:
     let f: File = open(pbm_fn, FileMode.fmWrite)
     defer:
-      close(f)
+      f.close
     f.write("P1\n")
     f.write(fmt"{line_len} {line_len}" & "\n")
     f.write(qrbin)
@@ -120,12 +120,12 @@ proc qr_data_to_pbm(pbm_fn: string, qrbin: string) =
 proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margin: int = 20) =
   # BMPファイルフォーマット
   # https://www.setsuki.com/hsp/ext/bmp.htm
-  let line_count = qrLine.len()
+  let line_count = qrLine.len
   let bmp_size: int = line_count * magnify + 2 * margin
   block:
     let f: File = open(bmp_fn, FileMode.fmWrite)
     defer:
-      f.close()
+      f.close
     f.write('B') # bfType
     f.write('M') # bfType
     let data_size: int = ((3 * bmp_size + 3) div 4) * 4 * bmp_size
@@ -248,15 +248,15 @@ proc layout() =
   box_output.contain(box_QR, box_decode)
 
 btn_input.wEvent_Button do ():
-  let input_file_name: seq[string] = file_sel.display()
+  let input_file_name: seq[string] = file_sel.display
   input_file.setValue(input_file_name[0])
   if rb_file.value == true:
-    if input_file.value.len() > 0:
-      btn_qr.enable()
-      btn_decode.enable()
+    if input_file.value.len > 0:
+      btn_qr.enable
+      btn_decode.enable
     else:
-      btn_qr.disable()
-      btn_decode.disable()
+      btn_qr.disable
+      btn_decode.disable
 
 proc layout_qr_ctl() =
   panel_qr_ctl.autolayout """
@@ -271,66 +271,71 @@ proc displayQr(idx: int) =
   bm = Image(fmt"{qr_file_name}{idx}")
   # bm.backgroundColor = -1
   memDc.selectObject(Bitmap(bm.size))
-  memDc.clear()
+  memDc.clear
   memDc.setBackground(wWhiteBrush)
   memDc.setBrush(wWhiteBrush)
   memDc.drawImage(bm, 0, 0)
-  panel_qr.center()
-  frame_qr.show()
-  panel_qr.refresh()
+  panel_qr.center
+  frame_qr.show
+  panel_qr.refresh
   layout_qr_ctl()
-  frame_qr_ctl.show()
+  frame_qr_ctl.show
 
 panel_qr.wEvent_Paint do ():
   var dc = PaintDC(panel_qr)
   dc.blit(source=memDc, xdest=0, ydest=0, width=bm.getSize().width, height=bm.getSize().height)
   dc.delete
 
+proc setCurIdx(new_idx: int) =
+  cur_idx = new_idx
+  if cur_idx < high(qr_codes):
+    btn_next.enable
+  else:
+    btn_next.disable
+  displayQr(cur_idx)
+
 proc popupQR(data_file_name: Path) =
   block:
     let f: File = open(data_file_name.string(), FileMode.fmRead)
     defer:
-      f.close()
-    let data = f.readAll()
+      f.close
+    let data = f.readAll
     var err_level: string = ""
     for k, v in list_err:
-      if cb_err.value().startsWith(k):
+      if cb_err.value.startsWith(k):
         err_level = k
     qr_codes = make_qr_data(data_file_name.lastPathPart.string, data, err_level)
   label_total.setLabel(fmt" / {qr_codes.len}")
-  cur_idx = 0
-  displayQr(0)
+  setCurIdx(0)
 
 btn_head.wEvent_Button do ():
   if cur_idx == low(qr_codes):
     return
-  cur_idx = low(qr_codes)
-  displayQr(cur_idx)
+  setCurIdx(low(qr_codes))
 
 btn_next.wEvent_Button do ():
   if cur_idx < high(qr_codes):
     cur_idx += 1
-    displayQr(cur_idx)
+    setCurIdx(cur_idx)
 
 btn_tail.wEvent_Button do ():
   if cur_idx == high(qr_codes):
     return
-  cur_idx = high(qr_codes)
-  displayQr(cur_idx)
+  setCurIdx(high(qr_codes))
 
 rb_file.value = true
-btn_qr.disable()
-btn_decode.disable()
+btn_qr.disable
+btn_decode.disable
 
 rb_file.wEvent_RadioButton do ():
-  input_file.enable()
-  btn_input.enable()
-  input_text.disable()
+  input_file.enable
+  btn_input.enable
+  input_text.disable
 
 rb_text.wEvent_RadioButton do ():
-  input_file.disable()
-  btn_input.disable()
-  input_text.enable()
+  input_file.disable
+  btn_input.disable
+  input_text.enable
 
 btn_qr.wEvent_Button do ():
   var in_data: string = ""
@@ -351,6 +356,6 @@ btn_decode.wEvent_Button do ():
       decode_qr_data(data)
 
 layout()
-frame.center()
-frame.show()
-app.mainLoop()
+frame.center
+frame.show
+app.mainLoop
