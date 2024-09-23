@@ -12,10 +12,6 @@ let list_err = {
   "H(30%)": (Ecc_HIGH,     1_272),
 }.toOrderedTable
 
-let app = App(wSystemDpiAware)
-let frame = Frame(title="File <=> QR")
-let panel = Panel(frame)
-
 proc num2bin2(number: int): string =
   [ fmt"{char((number shr  0) and 0xff)}",
     fmt"{char((number shr  8) and 0xff)}",
@@ -182,6 +178,10 @@ proc qr_data_to_bmp(bmp_fn: string, qrLine: seq[string], magnify: int = 1, margi
       for ix in (3 * bmp_size mod 4) ..< 4:
         f.write(fmt"{char(0x00)}")
 
+let app = App(wSystemDpiAware)
+let frame = Frame(title="File <=> QR")
+let panel = Panel(frame)
+
 frame.dpiAutoScale:
     frame.size = (750, 450)
 
@@ -209,6 +209,21 @@ let cb_err = ComboBox(panel, value=choices[low(choices)], choices=choices) # [li
 let btn_qr = Button(panel, label="Display QR codes")
 
 let btn_decode = Button(panel, label="Output Decode file")
+
+let frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
+let panel_qr_ctl = Panel(frame_qr_ctl)
+let frame_qr = Frame(title="QR code", size=(600, 630))
+let panel_qr = Panel(frame_qr)
+let btn_head = Button(panel_qr_ctl, label="▲▲")
+let btn_next = Button(panel_qr_ctl, label="▼")
+let btn_tail = Button(panel_qr_ctl, label="▼▼")
+var cur_idx: int = 0
+let label_cur_idx = StaticText(panel_qr_ctl, label="nnn")
+let label_total = StaticText(panel_qr_ctl, label=" / nnn")
+var bm: wImage = nil
+const qr_file_name = "test.bmp"
+var qr_codes: seq[seq[string]]
+var memDc = MemoryDC()
 
 proc layout() =
   panel.autolayout """
@@ -243,26 +258,15 @@ btn_input.wEvent_Button do ():
       btn_qr.disable()
       btn_decode.disable()
 
-let frame_qr_ctl = Frame(title="QR code ctl", size=(300, 200))
-let panel_qr_ctl = Panel(frame_qr_ctl)
-let frame_qr = Frame(title="QR code", size=(600, 630))
-let panel_qr = Panel(frame_qr)
-let btn_head = Button(panel_qr_ctl, label="▲▲")
-let btn_next = Button(panel_qr_ctl, label="▼")
-let btn_tail = Button(panel_qr_ctl, label="▼▼")
-var idx: int = 0
-var bm: wImage = nil
-const qr_file_name = "test.bmp"
-var qr_codes: seq[seq[string]]
-var memDc = MemoryDC()
-
 proc layout_qr_ctl() =
   panel_qr_ctl.autolayout """
-    H:|-[btn_head,btn_next,btn_tail]-|
-    V:|-[btn_head(=20%)]-[btn_next(=50%)]-[btn_tail(=20%)]-|
+    H:|-[btn_head,btn_next,btn_tail]-[label_cur_idx]-[label_total]-|
+    V:|-[btn_head]-[btn_next(btn_head.height*2)]-[btn_tail(btn_head.height)]-|
+    V:|-[label_cur_idx,label_total]-|
   """
 
 proc displayQr(idx: int) =
+  label_cur_idx.setLabel(idx.intToStr)
   qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3, margin=20)
   bm = Image(fmt"{qr_file_name}{idx}")
   # bm.backgroundColor = -1
@@ -293,24 +297,26 @@ proc popupQR(data_file_name: Path) =
       if cb_err.value().startsWith(k):
         err_level = k
     qr_codes = make_qr_data(data_file_name.lastPathPart.string, data, err_level)
+  label_total.setLabel(fmt" / {qr_codes.len}")
+  cur_idx = 0
   displayQr(0)
 
 btn_head.wEvent_Button do ():
-  if idx == low(qr_codes):
+  if cur_idx == low(qr_codes):
     return
-  idx = low(qr_codes)
-  displayQr(idx)
+  cur_idx = low(qr_codes)
+  displayQr(cur_idx)
 
 btn_next.wEvent_Button do ():
-  if idx < high(qr_codes):
-    idx += 1
-    displayQr(idx)
+  if cur_idx < high(qr_codes):
+    cur_idx += 1
+    displayQr(cur_idx)
 
 btn_tail.wEvent_Button do ():
-  if idx == high(qr_codes):
+  if cur_idx == high(qr_codes):
     return
-  idx = high(qr_codes)
-  displayQr(idx)
+  cur_idx = high(qr_codes)
+  displayQr(cur_idx)
 
 rb_file.value = true
 btn_qr.disable()
