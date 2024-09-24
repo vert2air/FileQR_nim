@@ -174,6 +174,13 @@ proc layout_qr_ctl() =
   """
 
 proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[string]] =
+  ## ファイル名 filename の内容 data を QRコードの bitmap データに変換する。
+  #
+  # Returns:
+  #   一般に data は、複数の QRコード に分かれる。返り値は、QRコードの配列。
+  #   各QRコードは、bitmap の各行のbitを '0'/'1' でエンコードしたものの配列。
+  #   一番上の行の左から右にbitが並び、次の配列はその下の行、と続く。
+
   result = @[]
   let base64data: string = filename & ":" & data.encode()
   let size_per_qr: int = list_err[err_cor][1] - fmt"12345678:001:100:".len()
