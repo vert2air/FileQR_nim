@@ -2,6 +2,7 @@ import wNim/wNim/[wApp, wBitmap, wBrush, wButton, wComboBox, wFileDialog,
   wFrame, wImage, wMemoryDC, wPaintDC, wPanel, wRadioButton, wStaticBox,
   wStaticText, wStatusBar, wTextCtrl, ]
 import qr
+import os
 import std/[base64, paths, re, strformat, strutils, tables]
 import checksums/sha1
 
@@ -129,7 +130,7 @@ var cur_idx: int = 0
 let label_cur_idx = StaticText(panel_qr_ctl, label="nnn")
 let label_total = StaticText(panel_qr_ctl, label=" / nnn")
 var bm: wImage = nil
-const qr_file_name = "test.bmp"
+const qr_file_name = "temporary_file_in_fileQr.bmp"
 var qr_codes: seq[seq[string]]
 var memDc = MemoryDC()
 
@@ -271,8 +272,10 @@ proc decode_qr_data(data: string) =
 
 proc displayQr(idx: int) =
   label_cur_idx.setLabel(idx.intToStr)
-  qr_data_to_bmp(fmt"{qr_file_name}{idx}", qr_codes[idx], magnify=3, margin=20)
-  bm = Image(fmt"{qr_file_name}{idx}")
+  if fileExists(qr_file_name):
+    removeFile(qr_file_name)
+  qr_data_to_bmp(fmt"{qr_file_name}", qr_codes[idx], magnify=3, margin=20)
+  bm = Image(fmt"{qr_file_name}")
   # bm.backgroundColor = -1
   memDc.selectObject(Bitmap(bm.size))
   memDc.clear
@@ -284,6 +287,7 @@ proc displayQr(idx: int) =
   panel_qr.refresh
   layout_qr_ctl()
   frame_qr_ctl.show
+  removeFile(qr_file_name)
 
 panel_qr.wEvent_Paint do ():
   var dc = PaintDC(panel_qr)
