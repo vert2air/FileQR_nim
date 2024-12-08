@@ -108,7 +108,7 @@ let input_file= TextCtrl(panel)
 let btn_input = Button(panel, label="Open..")
 let file_sel = FileDialog(panel, message="Open...")
 
-let input_text = TextCtrl(panel)
+let input_text = TextCtrl(panel, style=wTeMultiLine)
 
 let label_err = StaticText(panel, label="Error correct")
 var choices: seq[string] = @[]
@@ -143,7 +143,7 @@ proc layout() =
     outer: box_input
     H:|-[rb_file]-[input_file]-[btn_input(75)]-|
     H:|-[rb_text]-[input_text]-|
-    V:|-[rb_file,input_file,btn_input]-[rb_text, input_text]-|
+    V:|-[rb_file,input_file,btn_input]-[rb_text, input_text(200)]-|
 
     outer: box_QR
     H:|-[label_err]-[cb_err]-|
