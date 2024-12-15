@@ -305,17 +305,15 @@ proc setCurIdx(new_idx: int) =
     btn_next.disable
   displayQr(cur_idx)
 
-proc popupQR(data_file_name: Path) =
-  block:
-    let f: File = open(data_file_name.string(), FileMode.fmRead)
-    defer:
-      f.close
-    let data = f.readAll
-    var err_level: string = ""
-    for k, v in list_err:
-      if cb_err.value.startsWith(k):
-        err_level = k
-    qr_codes = make_qr_data(data_file_name.lastPathPart.string, data, err_level)
+proc popupQR(in_data: string, data_file_name: string) =
+  var err_level: string = ""
+  for k, v in list_err:
+    if cb_err.value.startsWith(k):
+      err_level = k
+  var base_name: string = "(direct text)"
+  if data_file_name != "":
+    base_name = data_file_name.Path.lastPathPart.string 
+  qr_codes = make_qr_data(base_name, in_data, err_level)
   label_total.setLabel(fmt" / {qr_codes.len}")
   setCurIdx(0)
 
@@ -339,20 +337,37 @@ rb_file.wEvent_RadioButton do ():
   input_file.enable
   btn_input.enable
   input_text.disable
+  btn_qr.disable
 
 rb_text.wEvent_RadioButton do ():
   input_file.disable
   btn_input.disable
   input_text.enable
+  if input_text.value.len > 0:
+    btn_qr.enable
+  else:
+    btn_qr.disable
+
+input_text.wEvent_TextUpdate do ():
+  if input_text.value.len > 0:
+    btn_qr.enable
+  else:
+    btn_qr.disable
 
 btn_qr.wEvent_Button do ():
   var in_data: string = ""
-  if rb_file.value == true and input_file.value.len() > 0:
-    in_data = input_file.value
-  elif rb_text.value == true:
+  var file_path: string = ""
+  if rb_file.value == true and input_file.value.len > 0:
+    block:
+      let f: File = open(input_file.value, FileMode.fmRead)
+      defer:
+        f.close
+      let in_data = f.readAll
+    file_path = input_file.value
+  elif rb_text.value == true and input_text.value.len > 0:
     in_data = input_text.value
-  if in_data.len() > 0:
-    popupQR(input_file.value.Path())
+  if in_data.len > 0:
+    in_data.popupQR(file_path)
 
 btn_decode.wEvent_Button do ():
   if rb_file.value == true and input_file.value.len() > 0:
