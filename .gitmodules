@@ -1,6 +1,6 @@
 [submodule "_deps/wNim"]
 	path = _deps/wNim
-	url = https://github.com/khchen/wNim
+	url = https://github.com/retsyo/wNim.git
 [submodule "_deps/nim_qr"]
 	path = _deps/nim_qr
 	url = https://github.com/ThomasTJdev/nim_qr
