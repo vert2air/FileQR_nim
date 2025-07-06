@@ -174,6 +174,10 @@ proc layout_qr_ctl() =
     V:|-[label_cur_idx,label_total]-|
   """
 
+# a / b で、端数を切り上げる。
+proc div_round_up(a: int, b: int): int =
+  return (a + b - 1) div b
+
 proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[string]] =
   ## ファイル名 filename の内容 data を QRコードの bitmap データに変換する。
   #
@@ -183,17 +187,18 @@ proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[stri
   #   一番上の行の左から右にbitが並び、次の配列はその下の行、と続く。
 
   result = @[]
-  let base64data: string = filename & ":" & data.encode()
-  let size_per_qr: int = list_err[err_cor][1] - fmt"12345678:001:100:".len()
-  let qrHash: string = ($secureHash(base64data & err_cor))[0..7]
-  let last_len: int = base64data.len() mod size_per_qr
-  let total: int = (base64data.len() + size_per_qr - 1) div size_per_qr
+  let fn_base64data: string = filename & ":" & data.encode()
+  let size_per_qr: int = list_err[err_cor][1] - fmt"12345678:001:".len()
+  let qrHash: string = ($secureHash(fn_base64data))[0..7]
+  let total: int = (3 + 1 + fn_base64data.len()).div_round_up(size_per_qr)
+  let allData = fmt"{total:03d}:" & fn_base64data
+  let last_len: int = allData.len() mod size_per_qr
 
-  for offset in countup(0, base64data.len() - last_len - 1, size_per_qr):
+  for offset in countup(0, allData.len() - last_len - 1, size_per_qr):
     statusBar.setStatusText(fmt"Encoding QR code {result.len} / {total}")
     var qrOrder: seq[string] = @[]
     for qrRevLine in qrBinary(
-            fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[offset ..< offset + size_per_qr],
+            fmt"{qrHash}:{result.len:03d}:" & allData[offset ..< offset + size_per_qr],
             eccLevel=list_err[err_cor][0]).splitLines:
       if qrRevLine.len() > 0:
         qrOrder.insert(qrRevLine, 0)
@@ -202,7 +207,7 @@ proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[stri
     statusBar.setStatusText(fmt"Encoding QR code {result.len} / {total}")
     var qrOrder: seq[string] = @[]
     for qrRevLine in qrBinary(
-              fmt"{qrHash}:{result.len:03d}:{total:03d}:" & base64data[result.len * size_per_qr .. ^1],
+              fmt"{qrHash}:{result.len:03d}:" & allData[result.len * size_per_qr .. ^1],
               eccLevel=list_err[err_cor][0]).splitLines:
       if qrRevLine.len() > 0:
         qrOrder.insert(qrRevLine, 0)
@@ -210,64 +215,54 @@ proc make_qr_data(filename: string, data: string, err_cor: string): seq[seq[stri
   statusBar.setStatusText(fmt"Encoding QR code done.")
 
 proc decode_qr_data(data: string) =
-  var acc = initTable[string, seq[string]]()
+  var acc = initTable[string, Table[int, string]]()
   statusBar.setStatusText("Scanning text in QR code...")
   for line in data.splitLines:
-    var matches: array[4, string]
-    if match(line, re".*([0-9a-fA-f]{8}):(000):(\d{3}):(.*:[0-9A-Za-z+/]*=*).*", matches):
-      # pass
-      discard matches
-    elif match(line, re".*([0-9a-fA-f]{8}):(\d{3}):(\d{3}):([0-9A-Za-z+/]*=*).*", matches):
-      # pass
-      discard matches
-    else:
+    var matches: array[3, string]
+    if not match(line, re".*([0-9a-fA-f]{8}):(\d{3}):(.*)", matches):
       # フォーマットが違った。
       echo fmt"discard line : illegal format : '{line}'"
       continue
     let hash = matches[0]
     let myIndex = matches[1].parseInt
-    let totalIndex = matches[2].parseInt
-    let nameAndBase64 = matches[3]
-    if myIndex >= totalIndex:
-      # この行のindexが総長を超えた。
-      echo "discard line : too big myIndex"
-      continue
-    if hash in acc:
-        # 既出のエントリだった。
-        if totalIndex != acc[hash].len:
-          # 総長が既出の値と違った。
-          echo "discard line : existed totalIndex different"
-          continue
-        if acc[hash][myIndex] != "":
-          # 処理済みのindexだった。
-          echo "discard line : duplicate index"
-          continue
-    else:
+    let chunkData = matches[2]
+    if hash notin acc:
       # 新出のエントリだった。
-      acc[hash] = newSeq[string](totalIndex)
-      echo fmt"add new hash : {hash}"
-    acc[hash][myIndex] = nameAndBase64
+      acc[hash] = initTable[int, string]()
+    elif myIndex in acc[hash] and acc[hash][myIndex] != "":
+      # 処理済みのindexだった。
+      echo "discard line : duplicate index"
+      continue
+    acc[hash][myIndex] = chunkData
   statusBar.setStatusText("Decoding text in QR code...")
   for hash in acc.keys:
+    var matches: array[3, string]
+    if 0 notin acc[hash]:
+      echo "not found 1st entry"
+      continue
+    if not acc[hash][0].match(re"^(\d{3}):(.*):([0-9A-Za-z+/]*=*).*", matches):
+      echo fmt"illegal 1st entry: {acc[hash][0]}"
+      continue
+    let data_cnt = matches[0].parseInt
+    let file_name = matches[1]
+    var allData = matches[2]
     var lack = false
-    for line in acc[hash]:
-      if line == "":
-        echo "not complete"
+    for ix in 1 ..< data_cnt:
+      if ix notin acc[hash]:
+        lack = true
+        break
+      if acc[hash][ix].match(re"([0-9A-Za-z+/]*=*)", matches):
+        allData &= matches[0]
+      else:
         lack = true
         break
     if lack:
       continue
-    echo fmt"output for hash : {hash}"
-    var matches: array[2, string]
-    if match(acc[hash].join, re"^(.*):(.*)$", matches):
-      let filename = matches[0]
-      let base64data = matches[1]
-      echo fmt"file name : {filename}"
-      block:
-        let outFile = open(filename, FileMode.fmWrite)
-        defer:
-          outFile.close
-        outFile.write(base64data.decode)
+    block:
+      let outFile = open(filename, FileMode.fmWrite)
+      defer:
+        outFile.close
+      outFile.write(allData.decode)
   statusBar.setStatusText("Decoding text in QR code done")
 
 proc displayQr(idx: int) =
