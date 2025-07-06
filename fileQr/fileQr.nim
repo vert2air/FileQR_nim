@@ -362,7 +362,7 @@ btn_qr.wEvent_Button do ():
       let f: File = open(input_file.value, FileMode.fmRead)
       defer:
         f.close
-      let in_data = f.readAll
+      in_data = f.readAll
     file_path = input_file.value
   elif rb_text.value == true and input_text.value.len > 0:
     in_data = input_text.value
